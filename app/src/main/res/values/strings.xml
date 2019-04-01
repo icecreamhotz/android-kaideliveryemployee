@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">kaidelivery-employee</string>
+    <string name="unkownrestaurantaddress">ไม่ทราบ</string>
+    <string name="thbath">บาท</string>
+    <string name="acceptorder">ตกลง</string>
+    <string name="declineorder">ยกเลิก</string>
+    <string name="ordernow">รายการสั่งอาหาร</string>
+    <string name="online">ออนไลน์</string>
+    <string name="offline">ออฟไลน์</string>
+    <string name="title_activity_maps_fragment">Map</string>
+</resources>

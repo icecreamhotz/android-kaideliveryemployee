@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "99509912056",
+    "firebase_url": "https://kaidelivery-f399f.firebaseio.com",
+    "project_id": "kaidelivery-f399f",
+    "storage_bucket": "kaidelivery-f399f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:99509912056:android:830f5e848677609a",
+        "android_client_info": {
+          "package_name": "app.icecreamhot.kaidelivery_employee"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "99509912056-7edpadcfl89kj5lfmnd6tbsqf1o053c6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "app.icecreamhot.kaidelivery_employee",
+            "certificate_hash": "0e54be984ef421735019565a6d85f3ca2a74987c"
+          }
+        },
+        {
+          "client_id": "99509912056-hcjfsilsuf7vnb080ctiq9nn7j2m7t4d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBjh80eQlMTa1aCcHmrzuAbAJhvzR6oWY4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "99509912056-hcjfsilsuf7vnb080ctiq9nn7j2m7t4d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

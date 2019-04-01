@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              app:cardCornerRadius="6dp"
+              app:cardElevation="6dp"
+              android:padding="0dp"
+              android:layout_margin="8dp">
+    
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            >
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="20dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+        >
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                <TextView
+                        android:id="@+id/txtOrderName"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:text="OR123456789"
+                        android:layout_weight="1"
+                />
+
+                <TextView
+                        android:id="@+id/txtTimeStart"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:textSize="12sp"
+                        android:text="OR123456789"
+                        android:gravity="bottom"
+                />
+
+            </LinearLayout>
+
+            <TextView
+                    android:id="@+id/txtCustomerName"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textSize="18sp"
+                    android:text="Anucha Phudtapranee"
+            />
+
+            <TextView
+                    android:id="@+id/txtDistanceCustomer"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textSize="12sp"
+                    android:text="1.5 km"
+            />
+
+            <TextView
+                    android:id="@+id/txtRestaurantName"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textSize="15sp"
+                    android:text="Mcdonald"
+                    android:layout_marginTop="5dp"
+            />
+
+            <TextView
+                    android:id="@+id/txtRestaurantAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textSize="12sp"
+                    android:textStyle="italic"
+                    android:text="Chiang mai"
+            />
+
+            <TextView
+                    android:id="@+id/txtDistanceRestaurant"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textSize="12sp"
+                    android:text="1.5 km"
+            />
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp">
+
+                <TextView
+                        android:id="@+id/txtFoodPrice"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:drawableLeft="@drawable/icon_foodprice"
+                        android:textSize="15sp"
+                        android:text="15 Bath"
+                        android:gravity="center"
+                />
+
+                <TextView
+                        android:id="@+id/txtDeveliryprice"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:textSize="15sp"
+                        android:drawableLeft="@drawable/icon_deliveryprice"
+                        android:text="40 Bath"
+                        android:gravity="center"
+                />
+
+                <TextView
+                        android:id="@+id/txtAllPrice"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:textSize="15sp"
+                        android:drawableLeft="@drawable/icon_totalprice"
+                        android:text="55 Bath"
+                        android:gravity="center"
+                />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp">
+
+            <Button
+                    android:id="@+id/acceptOrder"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/acceptorder"
+                    android:layout_weight="1"
+                    android:background="@color/btnAcceptOrder"
+            />
+
+            <Button
+                    android:id="@+id/declineOrder"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/declineorder"
+                    android:layout_weight="1"
+                    android:background="@color/btnDeclineOrder"
+            />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
