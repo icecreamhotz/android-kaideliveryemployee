@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+>
+
+    <LinearLayout
+                  android:orientation="vertical"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:padding="20dp"
+    >
+
+        <TextView
+                android:id="@+id/txtCusFullname"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="17sp"
+                android:text="Anucha Phudtapranee"
+        />
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:text="รายละเอียดการสั่ง"
+                android:layout_marginTop="5dp"
+        />
+
+        <TextView
+                android:id="@+id/txtCusFoodDetails"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text="อร่อยๆ"
+        />
+
+        <TextView
+                android:id="@+id/txtCusAddressName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="17sp"
+                android:text="RMUTL"
+                android:layout_marginTop="5dp"
+        />
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:text="รายละเอียดจุดส่ง"
+        />
+
+        <TextView
+                android:id="@+id/txtCusAddressDetails"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text="อร่อยๆ"
+        />
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:text="รายละเอียดจุดส่ง"
+                android:layout_marginTop="5dp"
+        />
+
+        <TextView
+                android:id="@+id/txtCusOrderStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text="อร่อยๆ"
+        />
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:text="เวลาสั่งออเดอร์"
+                android:layout_marginTop="5dp"
+        />
+
+        <TextView
+                android:id="@+id/txtCusOrderSend"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text="อร่อยๆ"
+        />
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:text="เวลารับออเดอร์"
+                android:layout_marginTop="5dp"
+        />
+
+        <TextView
+                android:id="@+id/txtCusOrderStart"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text="อร่อยๆ"
+        />
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:text="รายการอาหาร"
+                android:layout_marginTop="5dp"
+        />
+
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/foodListDetail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+        />
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:text="ผู้จัดส่ง"
+                android:layout_marginTop="5dp"
+        />
+
+        <TextView
+                android:id="@+id/txtCusEmployee"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text="Kiadtisak Lowongsa"
+        />
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingRight="10dp"
+                android:weightSum="2">
+
+            <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:text="รวมค่าอาหาร"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="1"
+            />
+
+            <TextView
+                    android:id="@+id/txtFoodPrice"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:text="Kiadtisak Lowongsa"
+                    android:layout_weight="1"
+                    android:gravity="right"
+            />
+
+        </LinearLayout>
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingRight="10dp"
+                android:weightSum="2">
+
+            <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:text="รวมค่าส่ง"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="1"
+            />
+
+            <TextView
+                    android:id="@+id/txtDeliveryPrice"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:text="Kiadtisak Lowongsa"
+                    android:layout_weight="1"
+                    android:gravity="right"
+            />
+
+        </LinearLayout>
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingRight="10dp"
+                android:weightSum="2">
+
+            <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:text="รวมราคาทั้งหมด"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="1"
+            />
+
+            <TextView
+                    android:id="@+id/txtAllPrice"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:text="Kiadtisak Lowongsa"
+                    android:layout_weight="1"
+                    android:gravity="right"
+            />
+
+        </LinearLayout>
+
+        <Button
+                android:id="@+id/btnOkOrderDetail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/btnAcceptOrder"
+                android:text="ปิด"
+                android:layout_marginTop="10dp"
+        />
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

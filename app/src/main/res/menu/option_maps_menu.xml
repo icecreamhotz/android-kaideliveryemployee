@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:title="Order Waiting"
+        android:id="@+id/orderColected"
+    />
+
+    <item
+        android:title="On the way"
+        android:id="@+id/onTheWay"
+    />
+
+    <item
+        android:title="Check Bill"
+        android:id="@+id/checkBill"
+    />
+
+</menu>

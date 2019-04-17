@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:padding="20dp">
+
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:text="รายการอาหาร"
+    />
+
+    <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/foodListDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+    />
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingRight="10dp"
+            android:weightSum="2">
+
+        <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:text="รวมค่าอาหาร"
+                android:layout_marginTop="5dp"
+                android:layout_weight="1"
+        />
+
+        <TextView
+                android:id="@+id/txtFoodPrice"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text="Kiadtisak Lowongsa"
+                android:layout_weight="1"
+                android:gravity="right"
+        />
+
+    </LinearLayout>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingRight="10dp"
+            android:weightSum="2">
+
+        <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:text="รวมค่าส่ง"
+                android:layout_marginTop="5dp"
+                android:layout_weight="1"
+        />
+
+        <TextView
+                android:id="@+id/txtDeliveryPrice"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text="Kiadtisak Lowongsa"
+                android:layout_weight="1"
+                android:gravity="right"
+        />
+
+    </LinearLayout>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingRight="10dp"
+            android:weightSum="2">
+
+        <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:text="รวมราคาทั้งหมด"
+                android:layout_marginTop="5dp"
+                android:layout_weight="1"
+        />
+
+        <TextView
+                android:id="@+id/txtAllPrice"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text="Kiadtisak Lowongsa"
+                android:layout_weight="1"
+                android:gravity="right"
+        />
+
+    </LinearLayout>
+
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:text="คำนวณเงินทอน"
+    />
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingRight="10dp"
+            android:weightSum="2">
+
+        <EditText
+                android:id="@+id/edtCalChange"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="กรอกเงินทอน"
+                android:layout_weight="1"
+                android:inputType="number"
+        />
+
+        <TextView
+                android:id="@+id/txtCalChange"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text=""
+                android:layout_weight="1"
+                android:gravity="right"
+        />
+
+    </LinearLayout>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingRight="10dp"
+            android:weightSum="2">
+
+        <Button
+                android:id="@+id/btnCheckBillOK"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/btnAcceptOrder"
+                android:text="ตกลง"
+                android:layout_marginTop="10dp"
+                android:layout_weight="1"
+        />
+
+        <Button
+                android:id="@+id/btnCheckBillCancel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorAccent"
+                android:text="ยกเลิก"
+                android:layout_marginTop="10dp"
+                android:layout_weight="1"
+        />
+
+    </LinearLayout>
+
+</LinearLayout>
