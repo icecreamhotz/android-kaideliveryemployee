@@ -11,10 +11,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
-import android.widget.Switch
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -23,9 +20,12 @@ import androidx.recyclerview.widget.RecyclerView
 import app.icecreamhot.kaidelivery_employee.R
 import app.icecreamhot.kaidelivery_employee.data.mLatitude
 import app.icecreamhot.kaidelivery_employee.data.mLongitude
+import app.icecreamhot.kaidelivery_employee.firebasemodel.EmployeeStatus
 import app.icecreamhot.kaidelivery_employee.firebasemodel.OrderFB
 import app.icecreamhot.kaidelivery_employee.model.Order
+import app.icecreamhot.kaidelivery_employee.network.EmployeeAPI
 import app.icecreamhot.kaidelivery_employee.network.OrderAPI
+import app.icecreamhot.kaidelivery_employee.ui.order.Alert.Dialog
 import app.icecreamhot.kaidelivery_employee.ui.order.Map.MapsFragment
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
@@ -33,16 +33,21 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.firebase.database.*
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_order_list.*
+import java.util.*
 
 class OrderListFragment: Fragment(), GoogleApiClient.ConnectionCallbacks,
     GoogleApiClient.OnConnectionFailedListener {
 
     private val orderAPI by lazy {
         OrderAPI.create()
+    }
+    private val employeeAPI by lazy {
+        EmployeeAPI.create()
     }
 
     private var disposable: Disposable? = null
@@ -59,12 +64,14 @@ class OrderListFragment: Fragment(), GoogleApiClient.ConnectionCallbacks,
     private lateinit var switchStatus: Switch
     private lateinit var recyclerView: RecyclerView
     private lateinit var textStatus: TextView
+    private lateinit var loadingOrder: ProgressBar
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.activity_order_list, container, false)
         switchStatus = view.findViewById(R.id.statusOnline)
         recyclerView = view.findViewById(R.id.orderList)
         textStatus = view.findViewById(R.id.statusText)
+        loadingOrder = view.findViewById(R.id.loadingOrder)
 
         googleApiClient = GoogleApiClient.Builder(activity!!.applicationContext)
             .addConnectionCallbacks(this)
@@ -98,8 +105,38 @@ class OrderListFragment: Fragment(), GoogleApiClient.ConnectionCallbacks,
         } else {
             Log.d("connected", "truegorhere")
         }
+        checkOrderNowIsExist()
 
         return view
+    }
+
+    private fun checkOrderNowIsExist() {
+        disposable = orderAPI.getDeliveryNow()
+            .subscribeOn(Schedulers.io())
+            .unsubscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe { loadingOrder.visibility = View.VISIBLE }
+            .doOnTerminate { loadingOrder.visibility = View.GONE }
+            .subscribe(
+                {
+                        result ->
+                    if(result.orderList?.get(0)?.order_name != null) {
+                                val mapsFragment = MapsFragment()
+                                val fm = fragmentManager
+                                fm?.beginTransaction()
+                                ?.replace(R.id.contentContainer, mapsFragment)
+                                ?.commitAllowingStateLoss()
+                    } else {
+                            loadOrderFromDatabase()
+                            loadOrderRealtime()
+                            loadStatusRealtime()
+                            changeStatusOnlineOffline()
+                    }
+                },
+                {
+                        err -> err.printStackTrace()
+                }
+            )
     }
 
     private fun loadStatusRealtime() {
@@ -124,18 +161,49 @@ class OrderListFragment: Fragment(), GoogleApiClient.ConnectionCallbacks,
     }
 
     private fun changeStatusOnlineOffline() {
-        ref = FirebaseDatabase.getInstance().getReference("Employees")
         switchStatus.setOnCheckedChangeListener { buttonView, isChecked ->
+            ref = FirebaseDatabase.getInstance().getReference("Employees")
             if(isChecked) {
-                ref.child("123").setValue("online").addOnCompleteListener {
-                    textStatus.text = activity?.getString(R.string.online)
-                    textStatus.setTextColor(ContextCompat.getColor(activity!!.applicationContext, R.color.colorSuccess))
-                }
+                disposable = employeeAPI.updateEmployeeStatus(1)
+                    .subscribeOn(Schedulers.io())
+                    .unsubscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnSubscribe { loadingOrder.visibility = View.VISIBLE }
+                    .doOnTerminate { loadingOrder.visibility = View.GONE }
+                    .subscribe(
+                        {
+                                result -> if(result.status) {
+                                val workingStatus = EmployeeStatus("online", 0)
+                                ref.child("123").setValue(workingStatus).addOnCompleteListener {
+                                    textStatus.text = activity?.getString(R.string.online)
+                                    textStatus.setTextColor(ContextCompat.getColor(activity!!.applicationContext, R.color.colorSuccess))
+                                }
+                            }
+                        },
+                        {
+                                err -> Log.d("errorja", err.message)
+                        }
+                    )
             } else {
-                ref.child("123").removeValue().addOnCompleteListener {
-                    textStatus.text = activity?.getString(R.string.offline)
-                    textStatus.setTextColor(ContextCompat.getColor(activity!!.applicationContext, R.color.colorAccent))
-                }
+                disposable = employeeAPI.updateEmployeeStatus(0)
+                    .subscribeOn(Schedulers.io())
+                    .unsubscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnSubscribe { loadingOrder.visibility = View.VISIBLE }
+                    .doOnTerminate { loadingOrder.visibility = View.GONE }
+                    .subscribe(
+                        {
+                                result -> if(result.status) {
+                                ref.child("123").removeValue().addOnCompleteListener {
+                                    textStatus.text = activity?.getString(R.string.offline)
+                                    textStatus.setTextColor(ContextCompat.getColor(activity!!.applicationContext, R.color.colorAccent))
+                                }
+                        }
+                        },
+                        {
+                                err -> Log.d("errorja", err.message)
+                        }
+                    )
             }
         }
     }
@@ -157,6 +225,7 @@ class OrderListFragment: Fragment(), GoogleApiClient.ConnectionCallbacks,
     private fun loadOrderFromDatabase() {
         disposable = orderAPI.getWaitingOrder()
             .subscribeOn(Schedulers.io())
+            .unsubscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { loadingOrder.visibility = View.VISIBLE }
             .doOnTerminate { loadingOrder.visibility = View.GONE }
@@ -182,6 +251,7 @@ class OrderListFragment: Fragment(), GoogleApiClient.ConnectionCallbacks,
         orderAdapter.onItemClick = { order ->
             disposable = orderAPI.updateEmployeeDelivery(order.order_id)
                 .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe { loadingOrder.visibility = View.VISIBLE }
                 .doOnTerminate { loadingOrder.visibility = View.GONE }
@@ -196,48 +266,67 @@ class OrderListFragment: Fragment(), GoogleApiClient.ConnectionCallbacks,
         }
 
         orderAdapter.onDeclineClick = { order ->
-            disposable = orderAPI.deleteOrderByID(order.order_id)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe { loadingOrder.visibility = View.VISIBLE }
-                .doOnTerminate { loadingOrder.visibility = View.GONE }
-                .subscribe(
-                    {
-                            deleteOrderFromFirebase(order)
-                    },
-                    {
-                            err -> Log.d("err", err.message)
-                    }
-                )
+            val transaction = fragmentManager
+            transaction?.beginTransaction()
+                ?.replace(R.id.contentContainer, CancelOrderFragment.newInstance(order.res_id))
+                ?.addToBackStack(null)
+                ?.commit()
         }
     }
 
     private fun deleteOrderFromFirebase(order: Order) {
         ref = FirebaseDatabase.getInstance().getReference("Orders").child(order.order_name)
         ref.removeValue().addOnSuccessListener {
-            Toast.makeText(activity!!.applicationContext, "Cancel", Toast.LENGTH_LONG).show()
+            Toast.makeText(activity!!.applicationContext, "Cancel Success", Toast.LENGTH_LONG).show()
         }
     }
 
     private fun updateToFirebase(order: Order) {
-        loadOrderFromDatabase()
+        disposable = employeeAPI.updateEmployeeStatus(1)
+            .subscribeOn(Schedulers.io())
+            .unsubscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe { loadingOrder.visibility = View.VISIBLE }
+            .doOnTerminate { loadingOrder.visibility = View.GONE }
+            .subscribe(
+                {
+                        result -> acceptOrder(order.order_name)
+                },
+                {
+                        err -> Log.d("errorja", err.message)
+                }
+            )
+    }
 
-        val refDelete = FirebaseDatabase.getInstance().getReference("Orders").child(order.order_name)
+
+    private fun acceptOrder(order_name: String) {
+        val refDelete = FirebaseDatabase.getInstance().getReference("Orders").child(order_name)
         refDelete.removeValue().addOnSuccessListener {
             Toast.makeText(activity!!.applicationContext, "Success", Toast.LENGTH_LONG).show()
         }
 
         val refDelivery = FirebaseDatabase.getInstance().getReference("Delivery")
 
-        val orderList = OrderFB(mLatitude, mLongitude)
+        val orderList = OrderFB(mLatitude, mLongitude, 123, 1)
 
-        refDelivery.child(order.order_name).setValue(orderList).addOnSuccessListener {
+        refDelivery.child(order_name).setValue(orderList).addOnSuccessListener {
             Toast.makeText(activity!!.applicationContext, "Success", Toast.LENGTH_LONG).show()
             val MapsFragment = MapsFragment()
             val transaction = fragmentManager
             transaction?.beginTransaction()
                 ?.replace(R.id.contentContainer, MapsFragment)
                 ?.addToBackStack(null)
+                ?.commit()
+        }
+
+        val updateWorkingStatus = FirebaseDatabase.getInstance().getReference("Employees")
+
+        updateWorkingStatus.child("123").child("status").setValue(1).addOnSuccessListener {
+            Toast.makeText(activity!!.applicationContext, "Success", Toast.LENGTH_LONG).show()
+            val mapsFragment = MapsFragment()
+            val fm = fragmentManager
+            fm?.beginTransaction()
+                ?.replace(R.id.contentContainer, mapsFragment)
                 ?.commit()
         }
     }
@@ -249,8 +338,8 @@ class OrderListFragment: Fragment(), GoogleApiClient.ConnectionCallbacks,
         }
     }
 
-    override fun onPause() {
-        super.onPause()
+    override fun onDestroyView() {
+        super.onDestroyView()
         disposable?.dispose()
     }
 
@@ -267,11 +356,6 @@ class OrderListFragment: Fragment(), GoogleApiClient.ConnectionCallbacks,
 
                 mLatitude = location.latitude
                 mLongitude = location.longitude
-
-                loadOrderFromDatabase()
-                loadOrderRealtime()
-                changeStatusOnlineOffline()
-                loadStatusRealtime()
             }
     }
 

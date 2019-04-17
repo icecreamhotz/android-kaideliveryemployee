@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import app.icecreamhot.kaidelivery_employee.R
 import app.icecreamhot.kaidelivery_employee.data.mLatitude
 import app.icecreamhot.kaidelivery_employee.data.mLongitude
+import app.icecreamhot.kaidelivery_employee.firebasemodel.LatLngFB
 import app.icecreamhot.kaidelivery_employee.firebasemodel.OrderFB
 import app.icecreamhot.kaidelivery_employee.model.Order
 import app.icecreamhot.kaidelivery_employee.network.OrderAPI
@@ -123,7 +124,7 @@ class OrderListActivity : AppCompatActivity(), GoogleApiClient.ConnectionCallbac
 
         val refDelivery = FirebaseDatabase.getInstance().getReference("Delivery")
 
-        val orderList = OrderFB(mLatitude, mLongitude)
+        val orderList = LatLngFB(mLatitude, mLongitude)
 
         refDelivery.child(order.order_name).setValue(orderList).addOnSuccessListener {
             Toast.makeText(applicationContext, "Success", Toast.LENGTH_LONG).show()

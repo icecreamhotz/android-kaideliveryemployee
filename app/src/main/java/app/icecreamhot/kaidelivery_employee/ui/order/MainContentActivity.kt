@@ -22,6 +22,7 @@ class MainContentActivity : AppCompatActivity() {
                 return@OnNavigationItemSelectedListener true
             }
             R.id.history -> {
+                replaceFragment(HistoryOrderFragment())
                 return@OnNavigationItemSelectedListener true
             }
         }

@@ -6,6 +6,8 @@ data class Order(
     val order_id: Int,
     val order_name: String,
     val order_details: String?,
+    val order_queue: Int?,
+    val min_minute: Int?,
     val user_id: Int,
     val res_id: Int,
     val emp_id: Int?,

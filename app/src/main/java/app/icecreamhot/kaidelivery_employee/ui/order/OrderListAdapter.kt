@@ -58,21 +58,26 @@ class OrderListAdapter @Inject constructor(val items: ArrayList<Order>): Recycle
             val allPrice = foodPrice + deliveryPrice
             val aliasBath = context.resources.getString(R.string.thbath)
             itemView.apply {
-                    txtOrderName.text = order.order_name
-                    txtTimeStart.text = order.order_start
-                    txtCustomerName.text = customerName
-                    txtDistanceCustomer.text = customerDistance
-                    txtRestaurantName.text = order.restaurant?.res_name
-                    txtRestaurantAddress.text = order.endpoint_name
-                    txtDistanceRestaurant.text = restaurantDistance
-                    txtFoodPrice.text = "${foodPrice} ${aliasBath}"
-                    txtDeveliryprice.text = "${deliveryPrice} ${aliasBath}"
-                    txtAllPrice.text = "${allPrice} ${aliasBath}"
+                if(order.min_minute != null) {
+                    txtMinMinute.text = "เวลาขั้นต่ำ ${order.min_minute} นาที"
+                    containerMinMinute.visibility = View.VISIBLE
+                }
+                txtOrderName.text = order.order_name
+                txtTimeStart.text = order.order_start
+                txtOrderQueue.text = "(คิวที่ ${order.order_queue.toString()})"
+                txtCustomerName.text = customerName
+                txtDistanceCustomer.text = customerDistance
+                txtRestaurantName.text = order.restaurant?.res_name
+                txtRestaurantAddress.text = order.endpoint_name
+                txtDistanceRestaurant.text = restaurantDistance
+                txtFoodPrice.text = "${foodPrice} ${aliasBath}"
+                txtDeveliryprice.text = "${deliveryPrice} ${aliasBath}"
+                txtAllPrice.text = "${allPrice} ${aliasBath}"
             }
         }
 
         fun getDistance(lat: Double?, lng: Double?): String {
-            var distance: Int
+            val distance: Int
 
             if(lat != null && lng != null) {
                 val startPoint = Location("locationOne")
