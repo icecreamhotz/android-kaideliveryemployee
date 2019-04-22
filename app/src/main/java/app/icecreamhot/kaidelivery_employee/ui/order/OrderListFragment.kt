@@ -244,6 +244,7 @@ class OrderListFragment: Fragment(), GoogleApiClient.ConnectionCallbacks,
         val orderAdapter = OrderListAdapter(order!!)
 
         recyclerView.apply {
+            setHasFixedSize(true)
             layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
             adapter = orderAdapter
         }
@@ -268,16 +269,55 @@ class OrderListFragment: Fragment(), GoogleApiClient.ConnectionCallbacks,
         orderAdapter.onDeclineClick = { order ->
             val transaction = fragmentManager
             transaction?.beginTransaction()
-                ?.replace(R.id.contentContainer, CancelOrderFragment.newInstance(order.res_id))
+                ?.replace(R.id.contentContainer, CancelOrderFragment.newInstance(order.order_id, order.order_name))
                 ?.addToBackStack(null)
                 ?.commit()
         }
-    }
 
-    private fun deleteOrderFromFirebase(order: Order) {
-        ref = FirebaseDatabase.getInstance().getReference("Orders").child(order.order_name)
-        ref.removeValue().addOnSuccessListener {
-            Toast.makeText(activity!!.applicationContext, "Cancel Success", Toast.LENGTH_LONG).show()
+        orderAdapter.onPreviousQueueClick = { orderId ->
+            disposable = orderAPI.updatePreviousQueue(orderId)
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe { loadingOrder.visibility = View.VISIBLE }
+                .doOnTerminate { loadingOrder.visibility = View.GONE }
+                .subscribe(
+                    {
+                            result ->
+                                if(result.status) {
+                                    loadOrderFromDatabase()
+                                    Toast.makeText(context, "Set Queue Success", Toast.LENGTH_LONG).show()
+                                } else {
+                                    Toast.makeText(context, "Set Queue Fail", Toast.LENGTH_LONG).show()
+                                }
+                    },
+                    {
+                            err -> Log.d("err", err.message)
+                    }
+                )
+        }
+
+        orderAdapter.onNextQueueClick = { orderId, orderQueue ->
+            disposable = orderAPI.updateNextQueue(orderId, orderQueue!!)
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe { loadingOrder.visibility = View.VISIBLE }
+                .doOnTerminate { loadingOrder.visibility = View.GONE }
+                .subscribe(
+                    {
+                            result ->
+                        if(result.status) {
+                            loadOrderFromDatabase()
+                            Toast.makeText(context, "Set Queue Success", Toast.LENGTH_LONG).show()
+                        } else {
+                            Toast.makeText(context, "Set Queue Fail", Toast.LENGTH_LONG).show()
+                        }
+                    },
+                    {
+                            err -> Log.d("err", err.message)
+                    }
+                )
         }
     }
 
@@ -299,35 +339,30 @@ class OrderListFragment: Fragment(), GoogleApiClient.ConnectionCallbacks,
     }
 
 
+
     private fun acceptOrder(order_name: String) {
         val refDelete = FirebaseDatabase.getInstance().getReference("Orders").child(order_name)
         refDelete.removeValue().addOnSuccessListener {
-            Toast.makeText(activity!!.applicationContext, "Success", Toast.LENGTH_LONG).show()
-        }
+            val createChannelChat = FirebaseDatabase.getInstance().getReference("Chats")
 
-        val refDelivery = FirebaseDatabase.getInstance().getReference("Delivery")
+            createChannelChat.setValue(order_name).addOnSuccessListener {
+                val refDelivery = FirebaseDatabase.getInstance().getReference("Delivery")
 
-        val orderList = OrderFB(mLatitude, mLongitude, 123, 1)
+                val orderList = OrderFB(mLatitude, mLongitude, 123, 1)
 
-        refDelivery.child(order_name).setValue(orderList).addOnSuccessListener {
-            Toast.makeText(activity!!.applicationContext, "Success", Toast.LENGTH_LONG).show()
-            val MapsFragment = MapsFragment()
-            val transaction = fragmentManager
-            transaction?.beginTransaction()
-                ?.replace(R.id.contentContainer, MapsFragment)
-                ?.addToBackStack(null)
-                ?.commit()
-        }
+                refDelivery.child(order_name).setValue(orderList).addOnSuccessListener {
+                    Toast.makeText(activity!!.applicationContext, "Success", Toast.LENGTH_SHORT).show()
+                    val updateWorkingStatus = FirebaseDatabase.getInstance().getReference("Employees")
 
-        val updateWorkingStatus = FirebaseDatabase.getInstance().getReference("Employees")
-
-        updateWorkingStatus.child("123").child("status").setValue(1).addOnSuccessListener {
-            Toast.makeText(activity!!.applicationContext, "Success", Toast.LENGTH_LONG).show()
-            val mapsFragment = MapsFragment()
-            val fm = fragmentManager
-            fm?.beginTransaction()
-                ?.replace(R.id.contentContainer, mapsFragment)
-                ?.commit()
+                    updateWorkingStatus.child("123").child("status").setValue(1).addOnSuccessListener {
+                        val mapsFragment = MapsFragment()
+                        val fm = fragmentManager
+                        fm?.beginTransaction()
+                            ?.replace(R.id.contentContainer, mapsFragment)
+                            ?.commit()
+                    }
+                }
+            }
         }
     }
 

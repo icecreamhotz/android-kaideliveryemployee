@@ -1,12 +1,11 @@
 package app.icecreamhot.kaidelivery_employee.ui.order
 
 import android.content.Context
-import android.location.Address
-import android.location.Geocoder
 import android.location.Location
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
 import app.icecreamhot.kaidelivery_employee.R
 import app.icecreamhot.kaidelivery_employee.data.gAliasDistance
@@ -15,7 +14,6 @@ import app.icecreamhot.kaidelivery_employee.data.mLatitude
 import app.icecreamhot.kaidelivery_employee.data.mLongitude
 import app.icecreamhot.kaidelivery_employee.model.Order
 import kotlinx.android.synthetic.main.item_order.view.*
-import java.lang.Exception
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.util.*
@@ -26,6 +24,8 @@ class OrderListAdapter @Inject constructor(val items: ArrayList<Order>): Recycle
     private lateinit var context:Context
     var onItemClick: ((Order) -> Unit)? = null
     var onDeclineClick: ((Order) -> Unit)? = null
+    var onPreviousQueueClick: ((Int) -> Unit)? = null
+    var onNextQueueClick: ((Int, Int?) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrderListAdapter.ViewHolder {
         context = parent.context
@@ -46,6 +46,31 @@ class OrderListAdapter @Inject constructor(val items: ArrayList<Order>): Recycle
             }
             view.declineOrder.setOnClickListener {
                 onDeclineClick?.invoke(items[adapterPosition])
+            }
+            view.txtOptionQueue.setOnClickListener {
+                val orderId = items[adapterPosition].order_id
+                val orderQueue = items[adapterPosition].order_queue
+
+                val popupMenu = PopupMenu(context, view.txtOptionQueue)
+                if(adapterPosition == 0) {
+                    popupMenu.inflate(R.menu.options_calcel_order_menu_noprevious)
+                } else {
+                    popupMenu.inflate(R.menu.options_cancel_order_menu)
+                }
+                popupMenu.setOnMenuItemClickListener {
+                    when(it.itemId) {
+                        R.id.menu_previous_queue ->
+                        {
+                            onPreviousQueueClick?.invoke(orderId)
+                        }
+                        R.id.menu_next_queue ->
+                        {
+                            onNextQueueClick?.invoke(orderId, orderQueue)
+                        }
+                    }
+                    true
+                }
+                popupMenu.show()
             }
         }
 

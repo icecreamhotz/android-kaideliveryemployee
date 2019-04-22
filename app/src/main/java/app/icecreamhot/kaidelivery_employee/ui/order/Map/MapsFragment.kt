@@ -11,37 +11,39 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.Button
+import android.widget.ImageButton
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import app.icecreamhot.kaidelivery_employee.R
 import app.icecreamhot.kaidelivery_employee.data.mLatitude
 import app.icecreamhot.kaidelivery_employee.data.mLongitude
-import app.icecreamhot.kaidelivery_employee.firebasemodel.LatLngFB
 import app.icecreamhot.kaidelivery_employee.firebasemodel.OrderFB
 import app.icecreamhot.kaidelivery_employee.model.GoogleMapDTO
 import app.icecreamhot.kaidelivery_employee.model.Order
-import app.icecreamhot.kaidelivery_employee.model.PolyLine
 import app.icecreamhot.kaidelivery_employee.network.OrderAPI
 import app.icecreamhot.kaidelivery_employee.ui.order.Alert.CheckBillDialog
 import app.icecreamhot.kaidelivery_employee.ui.order.Alert.FoodDetailDialog
+import app.icecreamhot.kaidelivery_employee.ui.order.Chat.ChatFragment
+import app.icecreamhot.kaidelivery_employee.utils.BASE_URL_EMPLOYEE_IMG
+import app.icecreamhot.kaidelivery_employee.utils.BASE_URL_USER_IMG
+import com.bumptech.glide.Glide
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
 import com.google.firebase.database.*
 import com.google.gson.Gson
+import de.hdodenhof.circleimageview.CircleImageView
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_maps_fragment.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.lang.Exception
@@ -49,10 +51,7 @@ import java.lang.Exception
 class MapsFragment : Fragment(),
     GoogleApiClient.ConnectionCallbacks,
     GoogleApiClient.OnConnectionFailedListener,
-    com.google.android.gms.location.LocationListener,
-    OnMapReadyCallback,
-    GoogleMap.OnCameraMoveListener,
-    GoogleMap.OnCameraIdleListener {
+    com.google.android.gms.location.LocationListener {
 
     private lateinit var mMap: GoogleMap
     lateinit var fusedLocationProviderClient: FusedLocationProviderClient
@@ -74,8 +73,15 @@ class MapsFragment : Fragment(),
     private lateinit var markerRestaurant: Marker
     private var polyline: Polyline? = null
 
+    lateinit var mMapView: MapView
     lateinit var btnOrderDetail: Button
+    lateinit var txtEmployeeName: TextView
+    lateinit var imgEmployee: CircleImageView
+    lateinit var imgChatButton: ImageButton
+
     lateinit var mOrder: ArrayList<app.icecreamhot.kaidelivery_employee.model.OrderAndFoodDetail.Order>
+
+    private var fcmUserToken: String? = null
 
     private val orderAPI by lazy {
         OrderAPI.create()
@@ -83,9 +89,30 @@ class MapsFragment : Fragment(),
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.activity_maps_fragment, container, false)
-        btnOrderDetail = view.findViewById(R.id.btnOrderDetail)
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
-        mapFragment?.getMapAsync(this)
+        mMapView = view.findViewById(R.id.mapView)
+        btnOrderDetail = view.findViewById<Button>(R.id.btnOrderDetail)
+        txtEmployeeName = view.findViewById(R.id.txtEmployeeName)
+        imgEmployee = view.findViewById(R.id.imgEmployee)
+        imgChatButton = view.findViewById(R.id.imgChat)
+
+        mMapView.onCreate(savedInstanceState)
+
+        mMapView.onResume()
+
+        mMapView.getMapAsync(object: OnMapReadyCallback  {
+            override fun onMapReady(googleMap: GoogleMap?) {
+                mMap = googleMap!!
+
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if(ContextCompat.checkSelfPermission(activity!!.applicationContext, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                        mMap.isMyLocationEnabled = true
+                    }
+                }
+                else {
+                    mMap.isMyLocationEnabled = true
+                }
+            }
+        })
 
         googleApiClient = GoogleApiClient.Builder(context!!)
             .addConnectionCallbacks(this)
@@ -98,33 +125,13 @@ class MapsFragment : Fragment(),
         }
 
         mLocationManager = activity?.applicationContext?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
         btnOrderDetail.setOnClickListener {
             val dialogDetailFragment = FoodDetailDialog.newInstance(mOrder)
             dialogDetailFragment.show(fragmentManager, "OrderDetailFragment")
         }
 
         return view
-    }
-
-    override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
-
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if(ContextCompat.checkSelfPermission(activity!!.applicationContext, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                mMap.isMyLocationEnabled = true
-            }
-        }
-        else {
-            mMap.isMyLocationEnabled = true
-        }
-    }
-
-    override fun onCameraMove() {
-        mMap.clear()
-    }
-
-    override fun onCameraIdle() {
-
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -158,30 +165,68 @@ class MapsFragment : Fragment(),
     }
 
     private fun onClickOrderCollected() {
-        order_name?.let {
-            order_status = 2
-            ref = FirebaseDatabase.getInstance().getReference("Delivery")
+        order_name?.let { order_name ->
+            fcmUserToken?.let { token ->
+                order_status = 2
+                disposable = orderAPI.updateStatusOrder(mOrder.get(0).order_id,
+                    2,
+                    null,
+                    "order waiting",
+                    token)
+                    .subscribeOn(Schedulers.io())
+                    .unsubscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+//                .doOnSubscribe { loadingOrder.visibility = View.VISIBLE }
+//                .doOnTerminate { loadingOrder.visibility = View.GONE }
+                    .subscribe(
+                        {
+                            ref = FirebaseDatabase.getInstance().getReference("Delivery")
 
-            val latLng = OrderFB(mLatitude, mLongitude, 123, 2)
-            ref.child(order_name!!).setValue(latLng).addOnSuccessListener {
-                Toast.makeText(activity?.applicationContext, "order waiting", Toast.LENGTH_SHORT).show()
+                            val latLng = OrderFB(mLatitude, mLongitude, 123, 2)
+                            ref.child(order_name!!).setValue(latLng).addOnSuccessListener {
+                                Toast.makeText(activity?.applicationContext, "order waiting", Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                        {
+                                err -> Log.d("err", err.message)
+                        }
+                    )
             }
         }
     }
 
     private fun onClickOnTheWay() {
-        order_name?.let {
-            order_status = 3
-            ref = FirebaseDatabase.getInstance().getReference("Delivery")
+        order_name?.let { order_name ->
+            fcmUserToken?.let { token ->
+                order_status = 3
+                disposable = orderAPI.updateStatusOrder(mOrder.get(0).order_id,
+                    3,
+                    null,
+                    "on the way",
+                    token)
+                    .subscribeOn(Schedulers.io())
+                    .unsubscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+//                .doOnSubscribe { loadingOrder.visibility = View.VISIBLE }
+//                .doOnTerminate { loadingOrder.visibility = View.GONE }
+                    .subscribe(
+                        {
+                            ref = FirebaseDatabase.getInstance().getReference("Delivery")
 
-            val latLng = OrderFB(mLatitude, mLongitude, 123, 3)
-            val now = LatLng(mLatitude!!, mLongitude!!)
-            ref.child(order_name!!).setValue(latLng).addOnSuccessListener {
-                markerRestaurant.remove()
-                markerEmployee.position = now
-                val url = getURL(now, endpoint)
-                GetDirection(url).execute()
-                Toast.makeText(activity?.applicationContext, "on the way", Toast.LENGTH_SHORT).show()
+                            val latLng = OrderFB(mLatitude, mLongitude, 123, 3)
+                            val now = LatLng(mLatitude!!, mLongitude!!)
+                            ref.child(order_name!!).setValue(latLng).addOnSuccessListener {
+                                markerRestaurant.remove()
+                                markerEmployee.position = now
+                                val url = getURL(now, endpoint)
+                                GetDirection(url).execute()
+                                Toast.makeText(activity?.applicationContext, "on the way", Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                        {
+                                err -> Log.d("err", err.message)
+                        }
+                    )
             }
         }
     }
@@ -275,6 +320,8 @@ class MapsFragment : Fragment(),
             .subscribe(
                 {
                         result ->
+                        setUserData(result.orderList)
+                        loadFCMUsetToken(result.orderList?.get(0)?.user_id)
                         getOrderStatus(result.orderList)
                         loadOrderDetail(result.orderList?.get(0)?.order_id)
                 },
@@ -282,6 +329,49 @@ class MapsFragment : Fragment(),
                         err -> Log.d("err", err.message)
                 }
             )
+    }
+
+    private fun setUserData(orderList: ArrayList<Order>?) {
+        val userFullname = "${orderList?.get(0)?.user?.name} ${orderList?.get(0)?.user?.lastname}"
+        val getUserImg = orderList?.get(0)?.user?.avatar
+        val userImg = BASE_URL_USER_IMG + if(getUserImg == null) "noimg.png" else getUserImg
+        val getEmployeeImg = orderList?.get(0)?.employee?.emp_avatar
+        val empImg = BASE_URL_EMPLOYEE_IMG + if(getEmployeeImg == null) "noimg.png" else getEmployeeImg
+
+        txtEmployeeName.text = userFullname
+        Glide
+            .with(activity!!)
+            .load(userImg)
+            .into(imgEmployee)
+
+        imgChatButton.setOnClickListener {
+            order_name?.let {
+                val chatFragment = ChatFragment.newInstance(it, userImg, empImg)
+
+                val transaction= fragmentManager
+                transaction?.beginTransaction()
+                    ?.replace(R.id.contentContainer, chatFragment)
+                    ?.addToBackStack(null)
+                    ?.commit()
+            }
+
+        }
+    }
+
+    private fun loadFCMUsetToken(userId: Int?) {
+        ref = FirebaseDatabase.getInstance().getReference("FCMToken")
+            .child("users")
+
+        ref.child(userId.toString()).addListenerForSingleValueEvent(object: ValueEventListener {
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+
+            override fun onDataChange(p0: DataSnapshot) {
+                fcmUserToken = p0.value.toString()
+                Log.d("kuy", fcmUserToken)
+            }
+        })
     }
 
     private fun loadOrderDetail(order_id: Int?) {
@@ -437,6 +527,26 @@ class MapsFragment : Fragment(),
         }
 
         return poly
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mMapView.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mMapView.onPause()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mMapView.onDestroy()
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        mMapView.onLowMemory()
     }
 
     override fun onDestroyView() {

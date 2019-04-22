@@ -106,7 +106,11 @@ class CheckBillDialog: DialogFragment() {
         })
 
         btnOk.setOnClickListener {
-            disposable = orderAPI.deleteOrderByID(mOrder.get(0).order_id, 4)
+            disposable = orderAPI.updateStatusOrder(mOrder.get(0).order_id,
+                4,
+                null,
+                null,
+                null)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

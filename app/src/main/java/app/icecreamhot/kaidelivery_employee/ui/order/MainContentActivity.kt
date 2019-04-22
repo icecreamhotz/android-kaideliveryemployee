@@ -2,14 +2,19 @@ package app.icecreamhot.kaidelivery_employee.ui.order
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import app.icecreamhot.kaidelivery_employee.R
 import app.icecreamhot.kaidelivery_employee.ui.order.Map.MapsFragment
 import com.google.android.gms.maps.MapFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.iid.FirebaseInstanceId
 import kotlinx.android.synthetic.main.activity_main_content.*
+import java.io.IOException
 
 class MainContentActivity : AppCompatActivity() {
+
+    private val TAG = "MyFirebaseToken"
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when(item.itemId) {
@@ -40,11 +45,22 @@ class MainContentActivity : AppCompatActivity() {
         }
 
         bottomNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
+        initView()
     }
 
     private fun replaceFragment(fragment: Fragment) {
         val fragmentTransaction = supportFragmentManager.beginTransaction()
         fragmentTransaction.replace(R.id.contentContainer, fragment)
         fragmentTransaction.commit()
+    }
+
+    private fun initView() {
+        Thread(Runnable {
+            try {
+                Log.i(TAG, FirebaseInstanceId.getInstance().getToken("99509912056", "FCM"))
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }).start()
     }
 }

@@ -31,10 +31,13 @@
                 android:name="com.google.android.geo.API_KEY"
                 android:value="@string/google_maps_key"/>
 
-        <activity
-                android:name=".ui.order.Map.MapsFragment"
-                android:label="@string/title_activity_maps_fragment">
-        </activity>
+        <service
+                android:name=".service.MyFirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+
         <activity android:name=".ui.order.MainContentActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

@@ -3,6 +3,7 @@ package app.icecreamhot.kaidelivery_employee.network
 import app.icecreamhot.kaidelivery_employee.model.OrderAndFoodDetail.OrderHistoryResponse
 import app.icecreamhot.kaidelivery_employee.model.OrderAndFoodDetail.OrderResponse
 import app.icecreamhot.kaidelivery_employee.model.OrderList
+import app.icecreamhot.kaidelivery_employee.model.ResponseMAS
 import app.icecreamhot.kaidelivery_employee.utils.BASE_URL
 import io.reactivex.Observable
 import okhttp3.ResponseBody
@@ -31,8 +32,20 @@ interface OrderAPI {
 
     @FormUrlEncoded
     @POST("orders/update/status")
-    fun deleteOrderByID(@Field("order_id") order_id: Int,
-                        @Field("order_status") order_status: Int): Observable<ResponseBody>
+    fun updateStatusOrder(@Field("order_id") order_id: Int,
+                          @Field("order_status") order_status: Int,
+                          @Field("order_statusdetails") order_statusdetails: String?,
+                          @Field("message") message: String?,
+                          @Field("token") token: String?): Observable<ResponseMAS>
+
+    @FormUrlEncoded
+    @POST("orders/queue/previous")
+    fun updatePreviousQueue(@Field("order_id") order_id: Int): Observable<ResponseMAS>
+
+    @FormUrlEncoded
+    @POST("orders/queue/next")
+    fun updateNextQueue(@Field("order_id") order_id: Int,
+                            @Field("order_queue") order_queue: Int): Observable<ResponseMAS>
 
     companion object {
         fun create(): OrderAPI {

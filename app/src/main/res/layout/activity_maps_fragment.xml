@@ -1,21 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
-          android:layout_width="match_parent"
-          android:layout_height="match_parent"
-          android:id="@+id/map"
-          tools:context=".ui.order.Map.MapsFragment"
-          android:name="com.google.android.gms.maps.SupportMapFragment"
->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.google.android.gms.maps.MapView
+            android:id="@+id/mapView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    <androidx.cardview.widget.CardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/btnOrderDetail"
+            android:layout_centerHorizontal="true"
+            app:cardCornerRadius="4dp"
+    >
+
+        <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingVertical="10dp"
+                android:paddingHorizontal="15dp"
+        >
+
+            <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+            >
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/imgEmployee"
+                        android:layout_width="55dp"
+                        android:layout_height="40dp"
+                />
+
+                <TextView
+                        android:id="@+id/txtEmployeeName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:textStyle="bold"
+                        android:text="Anucha Phudtapranee"
+                        android:layout_marginLeft="10dp"
+                />
+
+                <ImageButton
+                        android:id="@+id/imgChat"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:background="@drawable/icon_chat"
+                        android:layout_marginLeft="10dp"
+                />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
 
     <Button
             android:id="@+id/btnOrderDetail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal|bottom"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="10dp"
             android:text="รายละเอียด"
             android:padding="10dp"
-            android:layout_marginTop="20dp"
             android:background="@null"/>
 
-</fragment>
+</RelativeLayout>

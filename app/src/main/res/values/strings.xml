@@ -8,4 +8,9 @@
     <string name="online">ออนไลน์</string>
     <string name="offline">ออฟไลน์</string>
     <string name="title_activity_maps_fragment">Map</string>
+
+    <!-- options cancel order menu -->
+    <string name="previousqueue">คิวก่อนหน้า</string>
+    <string name="nextqueue">คิวถัดไป</string>
+
 </resources>
