@@ -18,7 +18,8 @@ import app.icecreamhot.kaidelivery_employee.R
 import app.icecreamhot.kaidelivery_employee.model.OrderAndFoodDetail.Order
 import app.icecreamhot.kaidelivery_employee.network.OrderAPI
 import app.icecreamhot.kaidelivery_employee.ui.order.Adapter.FoodDetailAdapter
-import app.icecreamhot.kaidelivery_employee.ui.order.HistoryOrderFragment
+import app.icecreamhot.kaidelivery_employee.ui.order.HistoryAndComment.HistoryOrderFragment
+import app.icecreamhot.kaidelivery_employee.ui.order.HistoryAndComment.MainFragmentHistoryAndComment
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -109,8 +110,8 @@ class CheckBillDialog: DialogFragment() {
             disposable = orderAPI.updateStatusOrder(mOrder.get(0).order_id,
                 4,
                 null,
-                null,
-                null)
+                "delivered",
+                "dT65fviC3JU:APA91bEWwPgBE-prszQZIprelXfPH_fNxP1kkaD7_grVEHVCqtUK8YvjVMuVlT_FInQltk6p_ultdXLUq-AlznODa6mHH7PQ2b7xpc1uILLeLf7qM7Edik1oKkU3elXLkvcHvECe94Jb")
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -121,7 +122,7 @@ class CheckBillDialog: DialogFragment() {
                             deleteDelivery()
                     },
                     {
-                            err -> Log.d("err", err.message)
+                            err -> Log.d("errcheckbill", err.message)
                     }
                 )
         }
@@ -137,15 +138,15 @@ class CheckBillDialog: DialogFragment() {
     }
 
     private fun deleteDelivery() {
+        Log.d("deletedelivery", mOrder.get(0).order_name)
         ref = FirebaseDatabase.getInstance().getReference("Delivery").child(mOrder.get(0).order_name)
         ref.removeValue().addOnSuccessListener {
-            Toast.makeText(activity!!.applicationContext, "Cancel Success", Toast.LENGTH_LONG).show()
-            dialog.dismiss()
-            val goFragement = HistoryOrderFragment()
+            val goFragement = MainFragmentHistoryAndComment()
             val fm = fragmentManager
             fm?.beginTransaction()
                 ?.replace(R.id.contentContainer, goFragement)
                 ?.commitAllowingStateLoss()
+            dialog.dismiss()
         }
     }
 

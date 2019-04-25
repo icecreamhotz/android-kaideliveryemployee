@@ -1,18 +1,15 @@
-package app.icecreamhot.kaidelivery_employee.ui.order
+package app.icecreamhot.kaidelivery_employee.ui.order.HistoryAndComment
 
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import app.icecreamhot.kaidelivery_employee.R
-import app.icecreamhot.kaidelivery_employee.firebasemodel.EmployeeStatus
 import app.icecreamhot.kaidelivery_employee.model.OrderAndFoodDetail.OrderHistory
 import app.icecreamhot.kaidelivery_employee.network.OrderAPI
 import app.icecreamhot.kaidelivery_employee.ui.order.Adapter.OrderHistoryAdapter

@@ -5,8 +5,8 @@ import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import app.icecreamhot.kaidelivery_employee.R
+import app.icecreamhot.kaidelivery_employee.ui.order.HistoryAndComment.MainFragmentHistoryAndComment
 import app.icecreamhot.kaidelivery_employee.ui.order.Map.MapsFragment
-import com.google.android.gms.maps.MapFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.iid.FirebaseInstanceId
 import kotlinx.android.synthetic.main.activity_main_content.*
@@ -27,7 +27,7 @@ class MainContentActivity : AppCompatActivity() {
                 return@OnNavigationItemSelectedListener true
             }
             R.id.history -> {
-                replaceFragment(HistoryOrderFragment())
+                replaceFragment(MainFragmentHistoryAndComment())
                 return@OnNavigationItemSelectedListener true
             }
         }

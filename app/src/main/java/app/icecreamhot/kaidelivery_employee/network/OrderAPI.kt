@@ -20,7 +20,7 @@ interface OrderAPI {
     @GET("orders/{orderId}")
     fun getOrderAndOrderDetail(@Path(value = "orderId", encoded= true) orderId: Int): Observable<OrderResponse>
 
-    @GET("orders/delivery/employee/worked")
+    @GET("orders/history/employee")
     fun getHistoryOrderEmployee(): Observable<OrderHistoryResponse>
 
     @GET("orders/delivery/employee/now")
