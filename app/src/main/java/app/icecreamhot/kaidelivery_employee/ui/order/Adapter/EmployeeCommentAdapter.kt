@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import app.icecreamhot.kaidelivery.model.RateAndComment.EmployeeScore
 import app.icecreamhot.kaidelivery_employee.R
 import app.icecreamhot.kaidelivery_employee.utils.BASE_URL_USER_IMG
+import app.icecreamhot.kaidelivery_employee.utils.FormatDateISO8601
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.item_employee_comment.view.*
 import java.lang.Exception
@@ -32,7 +33,7 @@ class EmployeeCommentAdapter(val scoreCommentList: ArrayList<EmployeeScore>): Re
             val fullName = "${scoreComment.user.name} ${scoreComment.user.lastname}"
             var avatar = scoreComment.user.avatar
             val imgUser = BASE_URL_USER_IMG + if(avatar == null) "noimg.png" else avatar
-            val dateComment = getDateTime(scoreComment.empscore_date)
+            val dateComment = FormatDateISO8601().getDateTime(scoreComment.empscore_date)
             val detailComment = scoreComment.empscore_comment
             val detailRate = scoreComment.empscore_rating.toString()
 
@@ -47,22 +48,6 @@ class EmployeeCommentAdapter(val scoreCommentList: ArrayList<EmployeeScore>): Re
                 txtUserRateComment.text = detailRate
                 txtUserDateComment.text = dateComment
                 Glide.with(itemView.context).load(imgUser).into(imgUserComment)
-            }
-        }
-
-        fun getDateTime(s: String): String? {
-            var parsed: Date? = null
-            var outputDate = ""
-            var df_input = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
-            var df_output = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-
-            try {
-                parsed = df_input.parse(s)
-                outputDate = df_output.format(parsed)
-
-                return outputDate
-            } catch (e: Exception) {
-                return e.toString()
             }
         }
 

@@ -1,6 +1,7 @@
 package app.icecreamhot.kaidelivery_employee.ui.order.Chat
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -15,14 +16,19 @@ import androidx.recyclerview.widget.RecyclerView
 import app.icecreamhot.kaidelivery_employee.R
 import app.icecreamhot.kaidelivery_employee.model.Chat.ChatMessage
 import app.icecreamhot.kaidelivery_employee.ui.order.Adapter.ChatAdapter
+import app.icecreamhot.kaidelivery_employee.utils.MY_PREFS
 import com.google.firebase.database.*
 import kotlin.collections.HashMap
 
-class ChatFragment: Fragment() {
+class
+ChatFragment: Fragment() {
 
     private lateinit var orderName: String
     private lateinit var userImg: String
     private lateinit var empImg: String
+    private var empId: Int? = null
+    private var userId: Int? = null
+
     private var arrChat = arrayListOf<ChatMessage>()
     private lateinit var chatAdapter: ChatAdapter
     private var lastTimestampChat: Long? = null
@@ -37,7 +43,9 @@ class ChatFragment: Fragment() {
     companion object {
         fun newInstance(order_name: String,
                         userImg: String,
-                        empImg: String) = ChatFragment().apply {
+                        empImg: String,
+                        empId: Int,
+                        userId: Int) = ChatFragment().apply {
             arguments = Bundle().apply {
                 order_name?.let {
                     putString("order_name", order_name)
@@ -47,6 +55,12 @@ class ChatFragment: Fragment() {
                 }
                 empImg?.let {
                     putString("emp_avatar", empImg)
+                }
+                empId?.let {
+                    putInt("emp_id", empId)
+                }
+                userId?.let {
+                    putInt("user_id", userId)
                 }
             }
         }
@@ -62,6 +76,12 @@ class ChatFragment: Fragment() {
         }
         arguments?.getString("emp_avatar")?.let {
             empImg = it
+        }
+        arguments?.getInt("emp_id")?.let {
+            empId = it
+        }
+        arguments?.getInt("user_id")?.let {
+            userId = it
         }
     }
 
@@ -80,7 +100,7 @@ class ChatFragment: Fragment() {
 
     private val onClickSendMessage = View.OnClickListener {
         val text = edtMessage.text.toString()
-        val message = ChatMessage(17, text, System.currentTimeMillis() / 1000, 86, false)
+        val message = ChatMessage(empId!!, text, System.currentTimeMillis() / 1000, userId!!, false)
         ref = FirebaseDatabase.getInstance().getReference("/Chats/$orderName").push()
 
         ref.setValue(message).addOnSuccessListener {
@@ -111,7 +131,7 @@ class ChatFragment: Fragment() {
                         val data = message.getValue(ChatMessage::class.java)
                         arrChat.add(data!!)
                     }
-                    chatAdapter = ChatAdapter(arrChat, userImg, empImg)
+                    chatAdapter = ChatAdapter(arrChat, userImg, empImg, empId!!)
                     listChat.apply {
                         layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
                         adapter = chatAdapter
@@ -137,7 +157,7 @@ class ChatFragment: Fragment() {
 
                     Log.d("chatreadtoid", toId.toString())
                     Log.d("chatreadfromid", fromId.toString())
-                    if(toId == 17 && fromId == 86) {
+                    if(toId == empId && fromId == userId) {
                         val hashMap = HashMap<String, Any>()
                         hashMap.put("read", true)
                         message.ref.updateChildren(hashMap)

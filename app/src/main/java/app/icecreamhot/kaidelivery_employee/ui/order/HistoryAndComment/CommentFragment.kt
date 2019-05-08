@@ -1,6 +1,7 @@
 package app.icecreamhot.kaidelivery_employee.ui.order.HistoryAndComment
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,6 +15,7 @@ import app.icecreamhot.kaidelivery.model.RateAndComment.EmployeeScore
 import app.icecreamhot.kaidelivery_employee.R
 import app.icecreamhot.kaidelivery_employee.network.EmployeeAPI
 import app.icecreamhot.kaidelivery_employee.ui.order.Adapter.EmployeeCommentAdapter
+import app.icecreamhot.kaidelivery_employee.utils.MY_PREFS
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -37,11 +39,14 @@ class CommentFragment: Fragment() {
         }
     }
 
+    private var pref: SharedPreferences? = null
+
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         arguments?.getInt("emp_id")?.let {
             empId = it
         }
+        pref = context?.getSharedPreferences(MY_PREFS, Context.MODE_PRIVATE)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -54,20 +59,22 @@ class CommentFragment: Fragment() {
     }
 
     private fun loadEmployeeCommentData() {
-        disposable = employeeAPI.getEmployeeScoreAndComment(17)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
+        val empId = pref?.getInt("emp_id", 0)
+        empId?.let {
+            disposable = employeeAPI.getEmployeeScoreAndComment(it)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
 //            .doOnSubscribe { loadingOrder.visibility = View.VISIBLE }
 //            .doOnTerminate { loadingOrder.visibility = View.GONE }
-            .subscribe(
-                {
-                        result -> setDataToEmployeeCommentList(result.data)
-                },
-                {
-                        err -> Log.d("err", err.message)
-                }
-            )
-
+                .subscribe(
+                    {
+                            result -> setDataToEmployeeCommentList(result.data)
+                    },
+                    {
+                            err -> Log.d("err", err.message)
+                    }
+                )
+        }
     }
 
     private fun setDataToEmployeeCommentList(result: ArrayList<EmployeeScore>) {

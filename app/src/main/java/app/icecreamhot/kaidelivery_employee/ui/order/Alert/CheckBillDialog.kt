@@ -1,5 +1,7 @@
 package app.icecreamhot.kaidelivery_employee.ui.order.Alert
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -16,10 +18,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import app.icecreamhot.kaidelivery_employee.R
 import app.icecreamhot.kaidelivery_employee.model.OrderAndFoodDetail.Order
+import app.icecreamhot.kaidelivery_employee.network.EmployeeAPI
 import app.icecreamhot.kaidelivery_employee.network.OrderAPI
 import app.icecreamhot.kaidelivery_employee.ui.order.Adapter.FoodDetailAdapter
 import app.icecreamhot.kaidelivery_employee.ui.order.HistoryAndComment.HistoryOrderFragment
 import app.icecreamhot.kaidelivery_employee.ui.order.HistoryAndComment.MainFragmentHistoryAndComment
+import app.icecreamhot.kaidelivery_employee.utils.MY_PREFS
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -50,8 +54,20 @@ class CheckBillDialog: DialogFragment() {
     private val orderAPI by lazy {
         OrderAPI.create()
     }
+
+    private val employeeAPI by lazy {
+        EmployeeAPI.create()
+    }
+
     private var disposable: Disposable? = null
     private lateinit var ref: DatabaseReference
+
+    private var pref: SharedPreferences? = null
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        pref = context?.getSharedPreferences(MY_PREFS, Context.MODE_PRIVATE)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         dialog.setTitle(mOrder.get(0).order_name)
@@ -71,7 +87,9 @@ class CheckBillDialog: DialogFragment() {
             foodPrice += calprice.orderdetail_price.toDouble() * calprice.orderdetail_total
         }
 
-        val allPrice = foodPrice + deliveryPrice
+        val allPrice = if(mOrder.get(0).order_price > 0) mOrder.get(0).order_price + deliveryPrice else foodPrice + deliveryPrice
+
+        Log.d("debugja", mOrder.get(0).order_price.toString())
 
         txtFoodPrice = view.findViewById(R.id.txtFoodPrice)
         txtDeliveryPrice = view.findViewById(R.id.txtDeliveryPrice)
@@ -107,11 +125,13 @@ class CheckBillDialog: DialogFragment() {
         })
 
         btnOk.setOnClickListener {
+            val jwtToken = pref?.getString("token", null)
             disposable = orderAPI.updateStatusOrder(mOrder.get(0).order_id,
                 4,
                 null,
                 "delivered",
-                "dT65fviC3JU:APA91bEWwPgBE-prszQZIprelXfPH_fNxP1kkaD7_grVEHVCqtUK8YvjVMuVlT_FInQltk6p_ultdXLUq-AlznODa6mHH7PQ2b7xpc1uILLeLf7qM7Edik1oKkU3elXLkvcHvECe94Jb")
+                mOrder.get(0).user_id.toString(),
+                jwtToken!!)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -138,15 +158,30 @@ class CheckBillDialog: DialogFragment() {
     }
 
     private fun deleteDelivery() {
-        Log.d("deletedelivery", mOrder.get(0).order_name)
-        ref = FirebaseDatabase.getInstance().getReference("Delivery").child(mOrder.get(0).order_name)
-        ref.removeValue().addOnSuccessListener {
-            val goFragement = MainFragmentHistoryAndComment()
-            val fm = fragmentManager
-            fm?.beginTransaction()
-                ?.replace(R.id.contentContainer, goFragement)
-                ?.commitAllowingStateLoss()
-            dialog.dismiss()
+        val token = pref?.getString("token", null)
+        token?.let {
+            disposable = employeeAPI.updateEmployeeStatus(1, it)
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    {
+                            result ->
+                        Log.d("deletedelivery", mOrder.get(0).order_name)
+                        ref = FirebaseDatabase.getInstance().getReference("Delivery").child(mOrder.get(0).order_name)
+                        ref.removeValue().addOnSuccessListener {
+                            val goFragement = MainFragmentHistoryAndComment()
+                            val fm = fragmentManager
+                            fm?.beginTransaction()
+                                ?.replace(R.id.contentContainer, goFragement)
+                                ?.commitAllowingStateLoss()
+                            dialog.dismiss()
+                        }
+                    },
+                    {
+                            err -> Log.d("errorja", err.message)
+                    }
+                )
         }
     }
 

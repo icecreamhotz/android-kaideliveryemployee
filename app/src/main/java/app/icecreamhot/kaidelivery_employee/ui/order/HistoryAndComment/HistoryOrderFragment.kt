@@ -1,5 +1,7 @@
 package app.icecreamhot.kaidelivery_employee.ui.order.HistoryAndComment
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,6 +15,8 @@ import app.icecreamhot.kaidelivery_employee.R
 import app.icecreamhot.kaidelivery_employee.model.OrderAndFoodDetail.OrderHistory
 import app.icecreamhot.kaidelivery_employee.network.OrderAPI
 import app.icecreamhot.kaidelivery_employee.ui.order.Adapter.OrderHistoryAdapter
+import app.icecreamhot.kaidelivery_employee.ui.order.Alert.FoodDetailsAndEditDialog
+import app.icecreamhot.kaidelivery_employee.utils.MY_PREFS
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -27,6 +31,13 @@ class HistoryOrderFragment: Fragment() {
 
     private var disposable: Disposable? = null
 
+    private var pref: SharedPreferences? = null
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        pref = context?.getSharedPreferences(MY_PREFS, Context.MODE_PRIVATE)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_history, container, false)
         rvHistoryOrder = view.findViewById(R.id.recyclerViewHistoryOrder)
@@ -35,20 +46,24 @@ class HistoryOrderFragment: Fragment() {
     }
 
     private fun loadHistoryEmployeeOrder() {
-        disposable = orderAPI.getHistoryOrderEmployee()
-            .subscribeOn(Schedulers.io())
-            .unsubscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
+        val token = pref?.getString("token", null)
+        Log.d("historyordertoken", token)
+        token?.let {
+            disposable = orderAPI.getHistoryOrderEmployee(it)
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
 //            .doOnSubscribe { loadingOrder.visibility = View.VISIBLE }
 //            .doOnTerminate { loadingOrder.visibility = View.GONE }
-            .subscribe(
-                {
-                        result -> setValueToView(result.data)
-                },
-                {
-                        err -> Log.d("errorja", err.message)
-                }
-            )
+                .subscribe(
+                    {
+                            result -> setValueToView(result.data)
+                    },
+                    {
+                            err -> Log.d("errorja", err.message)
+                    }
+                )
+        }
     }
 
     private fun setValueToView(data: ArrayList<OrderHistory>) {
@@ -58,6 +73,10 @@ class HistoryOrderFragment: Fragment() {
             layoutManager =  LinearLayoutManager(context, RecyclerView.VERTICAL, false)
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
             adapter = historyAdapter
+        }
+        historyAdapter.onItemClick = { order ->
+            val dialogFoodDetailsAndEdit = FoodDetailsAndEditDialog.newInstance(order.orderDetail)
+            dialogFoodDetailsAndEdit.show(fragmentManager, "OrderDetailsAndEditFragment")
         }
     }
 

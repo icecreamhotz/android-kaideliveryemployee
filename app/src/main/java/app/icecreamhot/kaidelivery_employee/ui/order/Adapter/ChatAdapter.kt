@@ -1,18 +1,20 @@
 package app.icecreamhot.kaidelivery_employee.ui.order.Adapter
 
+import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import app.icecreamhot.kaidelivery_employee.R
 import app.icecreamhot.kaidelivery_employee.model.Chat.ChatMessage
+import app.icecreamhot.kaidelivery_employee.utils.MY_PREFS
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.chat_to_layout.view.*
 
-class ChatAdapter(val arrChat: ArrayList<ChatMessage>, val userImg: String, val empImg: String): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ChatAdapter(val arrChat: ArrayList<ChatMessage>, val userImg: String, val empImg: String, val empId: Int): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     var mChat: MutableList<ChatMessage> = arrChat
-
     companion object {
         const val TYPE_CHAT_USER = 0
         const val TYPE_CHAT_EMPLOYEE = 1
@@ -25,7 +27,7 @@ class ChatAdapter(val arrChat: ArrayList<ChatMessage>, val userImg: String, val 
 
     override fun getItemViewType(position: Int): Int {
         val type = when(mChat[position].fromId) {
-            17 -> TYPE_CHAT_EMPLOYEE
+            empId -> TYPE_CHAT_EMPLOYEE
             else -> TYPE_CHAT_USER
         }
 

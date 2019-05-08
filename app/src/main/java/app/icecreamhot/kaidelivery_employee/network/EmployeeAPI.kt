@@ -12,11 +12,16 @@ import retrofit2.http.*
 interface EmployeeAPI {
 
     @FormUrlEncoded
-    @POST("orders/delivery")
-    fun updateEmployeeStatus(@Field("work_status") status: Int): Observable<ResponseMAS>
+    @POST("employees/working")
+    fun updateEmployeeStatus(@Field("work_status") status: Int, @Header("authorization") token: String): Observable<ResponseMAS>
 
     @GET("employees/score/comment/{empId}")
     fun getEmployeeScoreAndComment(@Path("empId") empId: Int): Observable<EmployeeList>
+
+    @FormUrlEncoded
+    @POST("employees/login")
+    fun loginCommon(@Field("emp_username") username: String?,
+                    @Field("emp_password") password: String?): Observable<app.icecreamhot.kaidelivery_employee.model.Auth.EmployeeList>
 
     companion object {
         fun create(): EmployeeAPI {

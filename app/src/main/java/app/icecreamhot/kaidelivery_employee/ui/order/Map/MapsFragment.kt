@@ -1,6 +1,7 @@
 package app.icecreamhot.kaidelivery_employee.ui.order.Map
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Location
@@ -26,10 +27,12 @@ import app.icecreamhot.kaidelivery_employee.model.GoogleMapDTO
 import app.icecreamhot.kaidelivery_employee.model.Order
 import app.icecreamhot.kaidelivery_employee.network.OrderAPI
 import app.icecreamhot.kaidelivery_employee.ui.order.Alert.CheckBillDialog
+import app.icecreamhot.kaidelivery_employee.ui.order.Alert.ConfirmCheckBill
 import app.icecreamhot.kaidelivery_employee.ui.order.Alert.FoodDetailDialog
 import app.icecreamhot.kaidelivery_employee.ui.order.Chat.ChatFragment
 import app.icecreamhot.kaidelivery_employee.utils.BASE_URL_EMPLOYEE_IMG
 import app.icecreamhot.kaidelivery_employee.utils.BASE_URL_USER_IMG
+import app.icecreamhot.kaidelivery_employee.utils.MY_PREFS
 import com.bumptech.glide.Glide
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
@@ -82,9 +85,17 @@ class MapsFragment : Fragment(),
     lateinit var mOrder: ArrayList<app.icecreamhot.kaidelivery_employee.model.OrderAndFoodDetail.Order>
 
     private var fcmUserToken: String? = null
+    private var pref: SharedPreferences? = null
+    private var jwtToken: String? = null
 
     private val orderAPI by lazy {
         OrderAPI.create()
+    }
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        pref = context?.getSharedPreferences(MY_PREFS, Context.MODE_PRIVATE)
+        jwtToken = pref?.getString("token", null)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -172,7 +183,8 @@ class MapsFragment : Fragment(),
                     2,
                     null,
                     "order waiting",
-                    token)
+                    token,
+                    jwtToken!!)
                     .subscribeOn(Schedulers.io())
                     .unsubscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -203,7 +215,8 @@ class MapsFragment : Fragment(),
                     3,
                     null,
                     "on the way",
-                    token)
+                    token,
+                    jwtToken!!)
                     .subscribeOn(Schedulers.io())
                     .unsubscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -232,7 +245,7 @@ class MapsFragment : Fragment(),
     }
 
     private fun onClickCheckbill() {
-        val dialogCheckBillDialog = CheckBillDialog.newInstance(mOrder)
+        val dialogCheckBillDialog = ConfirmCheckBill.newInstance(mOrder)
         dialogCheckBillDialog.show(fragmentManager, "dialogCheckBillDialog")
         Toast.makeText(activity?.applicationContext, "check bill", Toast.LENGTH_SHORT).show()
     }
@@ -312,7 +325,7 @@ class MapsFragment : Fragment(),
     }
 
     private fun loadDeliveryNow() {
-        disposable = orderAPI.getDeliveryNow()
+        disposable = orderAPI.getDeliveryNow(jwtToken!!)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
 //            .doOnSubscribe { loadingOrder.visibility = View.VISIBLE }
@@ -337,6 +350,8 @@ class MapsFragment : Fragment(),
         val userImg = BASE_URL_USER_IMG + if(getUserImg == null) "noimg.png" else getUserImg
         val getEmployeeImg = orderList?.get(0)?.employee?.emp_avatar
         val empImg = BASE_URL_EMPLOYEE_IMG + if(getEmployeeImg == null) "noimg.png" else getEmployeeImg
+        val empId = orderList?.get(0)?.emp_id
+        val userId = orderList?.get(0)?.user_id
 
         txtEmployeeName.text = userFullname
         Glide
@@ -346,7 +361,7 @@ class MapsFragment : Fragment(),
 
         imgChatButton.setOnClickListener {
             order_name?.let {
-                val chatFragment = ChatFragment.newInstance(it, userImg, empImg)
+                val chatFragment = ChatFragment.newInstance(it, userImg, empImg, empId!!, userId!!)
 
                 val transaction= fragmentManager
                 transaction?.beginTransaction()
@@ -369,7 +384,6 @@ class MapsFragment : Fragment(),
 
             override fun onDataChange(p0: DataSnapshot) {
                 fcmUserToken = p0.value.toString()
-                Log.d("kuy", fcmUserToken)
             }
         })
     }

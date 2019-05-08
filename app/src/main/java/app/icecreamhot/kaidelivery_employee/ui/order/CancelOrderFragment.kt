@@ -1,6 +1,7 @@
 package app.icecreamhot.kaidelivery_employee.ui.order
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -15,8 +16,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import app.icecreamhot.kaidelivery_employee.R
 import app.icecreamhot.kaidelivery_employee.model.Order
+import app.icecreamhot.kaidelivery_employee.network.EmployeeAPI
 import app.icecreamhot.kaidelivery_employee.network.OrderAPI
 import app.icecreamhot.kaidelivery_employee.ui.order.Adapter.CancelOrderAdapter
+import app.icecreamhot.kaidelivery_employee.utils.MY_PREFS
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -27,6 +30,10 @@ class CancelOrderFragment: Fragment() {
 
     private val orderAPI by lazy {
         OrderAPI.create()
+    }
+
+    private val employeeAPI by lazy {
+        EmployeeAPI.create()
     }
 
     private var order_id: Int? = null
@@ -59,6 +66,8 @@ class CancelOrderFragment: Fragment() {
         }
     }
 
+    private var pref: SharedPreferences? = null
+
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         arguments?.getInt("order_id")?.let {
@@ -67,6 +76,7 @@ class CancelOrderFragment: Fragment() {
         arguments?.getString("order_name")?.let {
             order_name = it
         }
+        pref = context?.getSharedPreferences(MY_PREFS, Context.MODE_PRIVATE)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -99,33 +109,54 @@ class CancelOrderFragment: Fragment() {
     }
 
     private fun deleteOrderFromFirebase(order_name: String) {
-        ref = FirebaseDatabase.getInstance().getReference("Orders").child(order_name)
-        ref.removeValue().addOnSuccessListener {
-            Toast.makeText(activity!!.applicationContext, "Cancel Success", Toast.LENGTH_LONG).show()
-            popStacktoOrderListFragment()
+        val token = pref?.getString("token", null)
+        token?.let {
+            disposable = employeeAPI.updateEmployeeStatus(1, it)
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe { loadingOrder.visibility = View.VISIBLE }
+                .doOnTerminate { loadingOrder.visibility = View.GONE }
+                .subscribe(
+                    {
+                            result ->
+                            ref = FirebaseDatabase.getInstance().getReference("Orders").child(order_name)
+                            ref.removeValue().addOnSuccessListener {
+                                Toast.makeText(activity!!.applicationContext, "Cancel Success", Toast.LENGTH_LONG).show()
+                                popStacktoOrderListFragment()
+                            }
+                    },
+                    {
+                            err -> Log.d("errorja", err.message)
+                    }
+                )
         }
     }
 
     private val setOnClickOk = View.OnClickListener {
-        orderStatusDetails?.let {
-            disposable = orderAPI.updateStatusOrder(order_id!!,
-                5,
-                orderStatusDetails,
-                null,
-                null)
-                .subscribeOn(Schedulers.io())
-                .unsubscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe { loadingOrder.show() }
-                .doOnTerminate { loadingOrder.hide() }
-                .subscribe(
-                    {
-                        deleteOrderFromFirebase(order_name!!)
-                    },
-                    {
-                            err -> Log.d("err", err.message)
-                    }
-                )
+        val token = pref?.getString("token", null)
+        token?.let {
+            orderStatusDetails?.let {
+                disposable = orderAPI.updateStatusOrder(order_id!!,
+                    5,
+                    orderStatusDetails,
+                    null,
+                    null,
+                    it)
+                    .subscribeOn(Schedulers.io())
+                    .unsubscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnSubscribe { loadingOrder.show() }
+                    .doOnTerminate { loadingOrder.hide() }
+                    .subscribe(
+                        {
+                            deleteOrderFromFirebase(order_name!!)
+                        },
+                        {
+                                err -> Log.d("err", err.message)
+                        }
+                    )
+            }
         }
     }
 

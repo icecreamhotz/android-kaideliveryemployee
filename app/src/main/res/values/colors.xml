@@ -9,4 +9,5 @@
     <color name="colorSuccess">#00e676</color>
     <color name="colorGray">#c7ccd6</color>
     <color name="colorWhite">#FFFFFF</color>
+    <color name="backgroundLogo">#ed2225</color>
 </resources>

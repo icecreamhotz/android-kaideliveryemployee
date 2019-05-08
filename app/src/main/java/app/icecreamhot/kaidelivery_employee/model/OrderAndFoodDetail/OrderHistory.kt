@@ -1,6 +1,5 @@
 package app.icecreamhot.kaidelivery_employee.model.OrderAndFoodDetail
 
-import app.icecreamhot.kaidelivery_employee.model.OrderAndFoodDetail.Restaurant
 import com.google.gson.annotations.SerializedName
 
 data class OrderHistory (
@@ -21,8 +20,10 @@ data class OrderHistory (
     val order_score: Int?,
     val order_comment: String?,
     val order_status: String,
+    val order_statusdetails: String?,
     val order_timeout: String?,
     val order_deliveryprice: Double,
+    val order_price: Double,
     val order_discount: Double?,
     val order_date: String,
     val order_start: String,
@@ -31,5 +32,9 @@ data class OrderHistory (
     @SerializedName("restaurant")
     val restaurant: Restaurant,
     @SerializedName("user")
-    val user: User
+    val user: User,
+    @SerializedName("totalPrice")
+    val orderDetailsPrice: Double,
+    @SerializedName("orderdetails")
+    val orderDetail: List<OrderDetail>
 )
