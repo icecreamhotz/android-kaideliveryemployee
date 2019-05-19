@@ -52,6 +52,7 @@
                 android:paddingLeft="20dp"
                 android:drawableLeft="@drawable/icon_user"
                 android:layout_below="@+id/imageView"
+                android:text="icecreamhot"
         />
 
         <View
@@ -77,6 +78,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:paddingLeft="20dp"
+                android:text="Zazaza1b"
                 android:drawableLeft="@drawable/icon_password"
         />
 
@@ -93,7 +95,7 @@
                 android:fontFamily="sans-serif"
                 android:textStyle="normal|bold"
                 android:layout_below="@+id/editPassword"
-                android:text="LOGIN"
+                android:text="@string/login"
         />
 
     </LinearLayout>

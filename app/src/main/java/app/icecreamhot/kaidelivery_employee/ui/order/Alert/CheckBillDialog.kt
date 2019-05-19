@@ -21,7 +21,6 @@ import app.icecreamhot.kaidelivery_employee.model.OrderAndFoodDetail.Order
 import app.icecreamhot.kaidelivery_employee.network.EmployeeAPI
 import app.icecreamhot.kaidelivery_employee.network.OrderAPI
 import app.icecreamhot.kaidelivery_employee.ui.order.Adapter.FoodDetailAdapter
-import app.icecreamhot.kaidelivery_employee.ui.order.HistoryAndComment.HistoryOrderFragment
 import app.icecreamhot.kaidelivery_employee.ui.order.HistoryAndComment.MainFragmentHistoryAndComment
 import app.icecreamhot.kaidelivery_employee.utils.MY_PREFS
 import com.google.firebase.database.DatabaseReference
@@ -29,6 +28,8 @@ import com.google.firebase.database.FirebaseDatabase
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import java.text.SimpleDateFormat
+import java.util.*
 
 class CheckBillDialog: DialogFragment() {
 
@@ -50,6 +51,8 @@ class CheckBillDialog: DialogFragment() {
     private lateinit var foodListRv: RecyclerView
     private lateinit var btnOk: Button
     private lateinit var btnCancel: Button
+
+    private var foodPrice = 0.0
 
     private val orderAPI by lazy {
         OrderAPI.create()
@@ -78,7 +81,6 @@ class CheckBillDialog: DialogFragment() {
     }
 
     private fun initView(view: View) {
-        var foodPrice = 0.0
         val deliveryPrice = mOrder.get(0).order_deliveryprice
 
         val foodAdapter = FoodDetailAdapter(mOrder.get(0).order_detail)
@@ -88,8 +90,6 @@ class CheckBillDialog: DialogFragment() {
         }
 
         val allPrice = if(mOrder.get(0).order_price > 0) mOrder.get(0).order_price + deliveryPrice else foodPrice + deliveryPrice
-
-        Log.d("debugja", mOrder.get(0).order_price.toString())
 
         txtFoodPrice = view.findViewById(R.id.txtFoodPrice)
         txtDeliveryPrice = view.findViewById(R.id.txtDeliveryPrice)
@@ -139,7 +139,7 @@ class CheckBillDialog: DialogFragment() {
 //                .doOnTerminate { loadingOrder.visibility = View.GONE }
                 .subscribe(
                     {
-                            deleteDelivery()
+                            updateTimeOut()
                     },
                     {
                             err -> Log.d("errcheckbill", err.message)
@@ -155,6 +155,32 @@ class CheckBillDialog: DialogFragment() {
             layoutManager =  LinearLayoutManager(context, RecyclerView.VERTICAL, false)
             adapter = foodAdapter
         }
+    }
+
+    private fun updateTimeOut() {
+        val jwtToken = pref?.getString("token", null)
+        val cal = Calendar.getInstance()
+        val format = SimpleDateFormat("hh:mm:ss")
+        val datetime = format.format(cal.time)
+        val orderPrice =  if(mOrder.get(0).order_price > 0) mOrder.get(0).order_price  else foodPrice
+
+        disposable = orderAPI.updateTimeOut(mOrder.get(0).order_id,
+            datetime,
+            orderPrice,
+            jwtToken!!)
+            .subscribeOn(Schedulers.io())
+            .unsubscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+//                .doOnSubscribe { loadingOrder.visibility = View.VISIBLE }
+//                .doOnTerminate { loadingOrder.visibility = View.GONE }
+            .subscribe(
+                {
+                    deleteDelivery()
+                },
+                {
+                        err -> Log.d("errcheckbill", err.message)
+                }
+            )
     }
 
     private fun deleteDelivery() {

@@ -40,6 +40,13 @@ interface OrderAPI {
                           @Header("authorization") jwtToken: String): Observable<ResponseMAS>
 
     @FormUrlEncoded
+    @POST("orders/update/timeout")
+    fun updateTimeOut(@Field("order_id") order_id: Int,
+                      @Field("timeout") order_timeout: String,
+                      @Field("foodprice") food_price: Double,
+                      @Header("authorization") jwtToken: String): Observable<ResponseMAS>
+
+    @FormUrlEncoded
     @POST("orders/queue/previous")
     fun updatePreviousQueue(@Field("order_id") order_id: Int): Observable<ResponseMAS>
 

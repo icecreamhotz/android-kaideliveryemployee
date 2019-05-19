@@ -10,7 +10,7 @@
             android:layout_height="wrap_content"
             android:textStyle="bold"
             android:textSize="18sp"
-            android:text="รายการอาหาร"
+            android:text="@string/food_lists"
     />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -32,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:textSize="16sp"
-                android:text="รวมค่าอาหาร"
+                android:text="@string/total"
                 android:layout_marginTop="5dp"
                 android:layout_weight="1"
         />
@@ -61,7 +61,7 @@
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:textSize="16sp"
-                android:text="รวมค่าส่ง"
+                android:text="@string/delivery"
                 android:layout_marginTop="5dp"
                 android:layout_weight="1"
         />
@@ -90,7 +90,7 @@
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:textSize="16sp"
-                android:text="รวมราคาทั้งหมด"
+                android:text="@string/total"
                 android:layout_marginTop="5dp"
                 android:layout_weight="1"
         />
@@ -112,7 +112,7 @@
             android:layout_height="wrap_content"
             android:textStyle="bold"
             android:textSize="18sp"
-            android:text="คำนวณเงินทอน"
+            android:text="@string/calculate_change"
     />
 
     <LinearLayout
@@ -126,7 +126,7 @@
                 android:id="@+id/edtCalChange"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:hint="กรอกเงินทอน"
+                android:hint="@string/change_input"
                 android:layout_weight="2"
                 android:inputType="number"
         />
@@ -136,7 +136,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
-                android:text="บาท"
+                android:text="@string/thbath"
                 android:layout_weight="1"
                 android:gravity="right"
         />
@@ -155,7 +155,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/btnAcceptOrder"
-                android:text="ตกลง"
+                android:text="@string/accept_order"
                 android:layout_marginTop="10dp"
                 android:layout_weight="1"
         />
@@ -165,7 +165,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/colorAccent"
-                android:text="ยกเลิก"
+                android:text="@string/cancel"
                 android:layout_marginTop="10dp"
                 android:layout_weight="1"
         />

@@ -25,7 +25,7 @@
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:textSize="16sp"
-                android:text="รายละเอียดการสั่ง"
+                android:text="@string/order_detail"
                 android:layout_marginTop="5dp"
         />
 
@@ -52,28 +52,11 @@
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:textSize="16sp"
-                android:text="รายละเอียดจุดส่ง"
+                android:text="@string/endpoint_detail"
         />
 
         <TextView
                 android:id="@+id/txtCusAddressDetails"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:text="อร่อยๆ"
-        />
-
-        <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:text="รายละเอียดจุดส่ง"
-                android:layout_marginTop="5dp"
-        />
-
-        <TextView
-                android:id="@+id/txtCusOrderStatus"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
@@ -102,7 +85,7 @@
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:textSize="16sp"
-                android:text="เวลารับออเดอร์"
+                android:text="@string/start_order"
                 android:layout_marginTop="5dp"
         />
 
@@ -119,7 +102,7 @@
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:textSize="18sp"
-                android:text="รายการอาหาร"
+                android:text="@string/accept_order"
                 android:layout_marginTop="5dp"
         />
 
@@ -135,7 +118,7 @@
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:textSize="16sp"
-                android:text="ผู้จัดส่ง"
+                android:text="@string/passenger"
                 android:layout_marginTop="5dp"
         />
 
@@ -159,7 +142,7 @@
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:textSize="16sp"
-                    android:text="รวมค่าอาหาร"
+                    android:text="@string/subtotal"
                     android:layout_marginTop="5dp"
                     android:layout_weight="1"
             />
@@ -188,7 +171,7 @@
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:textSize="16sp"
-                    android:text="รวมค่าส่ง"
+                    android:text="@string/delivery"
                     android:layout_marginTop="5dp"
                     android:layout_weight="1"
             />
@@ -217,7 +200,7 @@
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:textSize="16sp"
-                    android:text="รวมราคาทั้งหมด"
+                    android:text="@string/total"
                     android:layout_marginTop="5dp"
                     android:layout_weight="1"
             />
@@ -239,7 +222,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/btnAcceptOrder"
-                android:text="ปิด"
+                android:text="@string/ok"
                 android:layout_marginTop="10dp"
         />
 

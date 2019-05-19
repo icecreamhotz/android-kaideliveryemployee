@@ -29,7 +29,6 @@ class FoodDetailDialog: DialogFragment() {
     private lateinit var txtOrderDetail: TextView
     private lateinit var txtAddressName: TextView
     private lateinit var txtAddressDetail: TextView
-    private lateinit var txtOrderStatus: TextView
     private lateinit var txtOrderCreate: TextView
     private lateinit var txtOrderStart: TextView
     private lateinit var txtEmployee: TextView
@@ -64,7 +63,6 @@ class FoodDetailDialog: DialogFragment() {
         txtOrderDetail = view.findViewById(R.id.txtCusFoodDetails)
         txtAddressName = view.findViewById(R.id.txtCusAddressName)
         txtAddressDetail = view.findViewById(R.id.txtCusAddressDetails)
-        txtOrderStatus = view.findViewById(R.id.txtCusOrderStatus)
         txtOrderCreate = view.findViewById(R.id.txtCusOrderSend)
         txtOrderStart = view.findViewById(R.id.txtCusOrderStart)
         txtEmployee = view.findViewById(R.id.txtCusEmployee)
@@ -78,7 +76,6 @@ class FoodDetailDialog: DialogFragment() {
         txtOrderDetail.text = if (mOrder.get(0).endpoint_details == null) "ไม่มี" else mOrder.get(0).endpoint_details
         txtAddressName.text = mOrder.get(0).endpoint_name
         txtAddressDetail.text = if (mOrder.get(0).order_details == null) "ไม่มี" else mOrder.get(0).order_details
-        txtOrderStatus.text = "wait"
         txtOrderCreate.text = mOrder.get(0).created_at
         txtOrderStart.text = mOrder.get(0).order_start
         txtEmployee.text = "${mOrder.get(0).employee.emp_name} ${mOrder.get(0).employee.emp_lastname}"

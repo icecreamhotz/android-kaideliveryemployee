@@ -82,7 +82,7 @@ class OrderListFragment: Fragment(), GoogleApiClient.ConnectionCallbacks,
         textStatus = view.findViewById(R.id.statusText)
         loadingOrder = view.findViewById(R.id.loadingOrder)
 
-        googleApiClient = GoogleApiClient.Builder(activity!!.applicationContext)
+            googleApiClient = GoogleApiClient.Builder(activity!!.applicationContext)
             .addConnectionCallbacks(this)
             .addOnConnectionFailedListener(this)
             .addApi(LocationServices.API)
@@ -91,6 +91,8 @@ class OrderListFragment: Fragment(), GoogleApiClient.ConnectionCallbacks,
         if(googleApiClient != null) {
             googleApiClient!!.connect()
         }
+
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(activity!!.applicationContext)
 
         val connectivityManager=activity?.applicationContext?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkInfo=connectivityManager.activeNetworkInfo
@@ -402,14 +404,13 @@ class OrderListFragment: Fragment(), GoogleApiClient.ConnectionCallbacks,
             return
         }
         startLocationUpdate()
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(activity!!.applicationContext)
-
         fusedLocationProviderClient.lastLocation
             .addOnSuccessListener {
-                    location: Location ->
-
-                mLatitude = location.latitude
-                mLongitude = location.longitude
+                    location ->
+                if(location != null) {
+                    mLatitude = location.latitude
+                    mLongitude = location.longitude
+                }
             }
     }
 

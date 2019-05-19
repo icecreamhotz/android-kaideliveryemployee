@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/menu_previous_queue" android:title="@string/previousqueue" />
-    <item android:id="@+id/menu_next_queue" android:title="@string/nextqueue" />
+    <item android:id="@+id/menu_previous_queue" android:title="@string/previous_queue" />
+    <item android:id="@+id/menu_next_queue" android:title="@string/next_queue" />
 </menu>

@@ -3,17 +3,22 @@
 
     <item
             android:id="@+id/restaurant"
-            android:title="Now Order"
+            android:title="@string/bottom_restaurant"
             android:icon="@drawable/icon_pencil" />
 
     <item
             android:id="@+id/order"
-            android:title="Delivery"
+            android:title="@string/bottom_delivery"
             android:icon="@drawable/icon_pencil" />
 
     <item
             android:id="@+id/history"
-            android:title="History"
+            android:title="@string/bottom_history"
+            android:icon="@drawable/icon_pencil" />
+
+    <item
+            android:id="@+id/report"
+            android:title="@string/bottom_report"
             android:icon="@drawable/icon_pencil" />
 
 </menu>

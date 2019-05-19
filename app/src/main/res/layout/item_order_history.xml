@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
+              xmlns:tools="http://schemas.android.com/tools" android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:padding="20dp">
@@ -57,6 +57,58 @@
 
         <TextView
                 android:id="@+id/txtPriceTotal"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:gravity="right"
+                android:textStyle="bold"
+                android:layout_weight="1"
+        />
+
+    </LinearLayout>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:weightSum="2"
+    >
+
+        <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:gravity="left"
+                android:textStyle="bold"
+                android:layout_weight="1"
+                android:text="@string/item_history_incomes"
+        />
+
+        <TextView
+                android:id="@+id/txtIncome"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:gravity="right"
+                android:textStyle="bold"
+                android:layout_weight="1"
+        />
+
+    </LinearLayout>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:weightSum="2"
+    >
+
+        <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:gravity="left"
+                android:textStyle="bold"
+                android:layout_weight="1"
+                android:text="@string/item_history_share"
+        />
+
+        <TextView
+                android:id="@+id/txtQuota"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:gravity="right"

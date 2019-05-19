@@ -2,17 +2,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:title="Order Waiting"
+        android:title="@string/order_waiting"
         android:id="@+id/orderColected"
     />
 
     <item
-        android:title="On the way"
+        android:title="@string/order_ontheway"
         android:id="@+id/onTheWay"
     />
 
     <item
-        android:title="Check Bill"
+        android:title="@string/order_checkbill"
         android:id="@+id/checkBill"
     />
 

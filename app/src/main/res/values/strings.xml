@@ -1,16 +1,85 @@
 <resources>
-    <string name="app_name">kaidelivery-employee</string>
-    <string name="unkownrestaurantaddress">ไม่ทราบ</string>
-    <string name="thbath">บาท</string>
-    <string name="acceptorder">ตกลง</string>
-    <string name="declineorder">ยกเลิก</string>
-    <string name="ordernow">รายการสั่งอาหาร</string>
-    <string name="online">ออนไลน์</string>
-    <string name="offline">ออฟไลน์</string>
+    <string name="app_name">kaidelivery</string>
+    <string name="unkownrestaurantaddress">Unknown</string>
+    <string name="thbath">Bath</string>
+    <string name="acceptorder">Accept</string>
+    <string name="declineorder">Cancel</string>
+    <string name="ordernow">Orders</string>
+    <string name="online">Online</string>
+    <string name="offline">Offline</string>
     <string name="title_activity_maps_fragment">Map</string>
 
-    <!-- options cancel order menu -->
-    <string name="previousqueue">คิวก่อนหน้า</string>
-    <string name="nextqueue">คิวถัดไป</string>
+    <!-- main activity -->
+    <string name="login">LOG IN</string>
 
+    <!-- side left nav -->
+    <string name="left_restaurant">Profile</string>
+    <string name="left_password">Change Password</string>
+    <string name="left_logout">Log out</string>
+
+    <!-- bottom nav -->
+    <string name="bottom_restaurant">Restaurant</string>
+    <string name="bottom_delivery">Delivery</string>
+    <string name="bottom_history">History</string>
+    <string name="bottom_report">Report</string>
+
+    <!-- option status on map activity -->
+    <string name="order_waiting">Order Waiting</string>
+    <string name="order_ontheway">One The Way</string>
+    <string name="order_checkbill">Check Bill</string>
+
+    <!-- option next previous queue -->
+    <string name="previous_queue">Previous</string>
+    <string name="next_queue">Next</string>
+
+    <!-- ok cancel -->
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- item_history -->
+    <string name="item_history_incomes">incomes</string>
+    <string name="item_history_share">share</string>
+
+    <!-- fragment_report -->
+    <string name="report_searchbyday">Search By Day</string>
+    <string name="report_searchbymonth">Search By Month</string>
+    <string name="report_searchbyyear">Search By Year</string>
+    <string name="report_searchbyrange">Search By Range</string>
+    <string name="to">to</string>
+
+    <!-- search button -->
+    <string name="search_button">Search</string>
+
+    <!-- edit_profile_layout -->
+    <string name="name">Name</string>
+    <string name="lastname">Lastname</string>
+    <string name="idcard">IDCard</string>
+    <string name="telephone">Telephone</string>
+    <string name="address">Address</string>
+
+    <!-- alert detail food -->
+    <string name="order_detail">Order Detail</string>
+    <string name="endpoint_detail">Endpoint Detail</string>
+    <string name="start_order">Start Order</string>
+    <string name="accept_order">Accept Order</string>
+    <string name="food_lists">Food Lists</string>
+    <string name="passenger">Passenger</string>
+    <string name="subtotal">Subtotal</string>
+    <string name="delivery">Delivery</string>
+    <string name="total">Total</string>
+
+    <!-- alert confirm check bill -->
+    <string name="custom_price_header">Custom Price</string>
+    <string name="custom_price">Price</string>
+    <string name="or">OR</string>
+    <string name="accept_old_price">Accept Old Price</string>
+
+    <!-- alert check bill -->
+    <string name="calculate_change">Calculate</string>
+    <string name="change_input">Money</string>
+
+    <!-- details -->
+    <string name="details">Details</string>
+
+    <string name="choose_language">Choose Language</string>
 </resources>

@@ -19,6 +19,8 @@ data class Restaurant(
     val res_address: String?,
     @SerializedName("res_details")
     val res_details: String?,
+    @SerializedName("res_quota")
+    val res_quota: Int,
     @SerializedName("res_open")
     val res_open: String?,
     @SerializedName("res_close")

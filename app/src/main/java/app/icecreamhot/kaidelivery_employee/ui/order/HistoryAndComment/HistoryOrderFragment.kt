@@ -47,7 +47,6 @@ class HistoryOrderFragment: Fragment() {
 
     private fun loadHistoryEmployeeOrder() {
         val token = pref?.getString("token", null)
-        Log.d("historyordertoken", token)
         token?.let {
             disposable = orderAPI.getHistoryOrderEmployee(it)
                 .subscribeOn(Schedulers.io())
@@ -67,7 +66,6 @@ class HistoryOrderFragment: Fragment() {
     }
 
     private fun setValueToView(data: ArrayList<OrderHistory>) {
-        Log.d("dataja", data.size.toString())
         val historyAdapter = OrderHistoryAdapter(data)
         rvHistoryOrder.apply {
             layoutManager =  LinearLayoutManager(context, RecyclerView.VERTICAL, false)
@@ -75,7 +73,7 @@ class HistoryOrderFragment: Fragment() {
             adapter = historyAdapter
         }
         historyAdapter.onItemClick = { order ->
-            val dialogFoodDetailsAndEdit = FoodDetailsAndEditDialog.newInstance(order.orderDetail)
+            val dialogFoodDetailsAndEdit = FoodDetailsAndEditDialog.newInstance(order)
             dialogFoodDetailsAndEdit.show(fragmentManager, "OrderDetailsAndEditFragment")
         }
     }

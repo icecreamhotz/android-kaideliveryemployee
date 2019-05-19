@@ -105,7 +105,6 @@ class MapsFragment : Fragment(),
         txtEmployeeName = view.findViewById(R.id.txtEmployeeName)
         imgEmployee = view.findViewById(R.id.imgEmployee)
         imgChatButton = view.findViewById(R.id.imgChat)
-
         mMapView.onCreate(savedInstanceState)
 
         mMapView.onResume()
@@ -134,6 +133,8 @@ class MapsFragment : Fragment(),
         if (googleApiClient != null) {
             googleApiClient!!.connect()
         }
+
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(activity!!.applicationContext)
 
         mLocationManager = activity?.applicationContext?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
@@ -255,14 +256,15 @@ class MapsFragment : Fragment(),
             return
         }
         startLocationUpdates()
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(activity!!.applicationContext)
 
         fusedLocationProviderClient.lastLocation
             .addOnSuccessListener {
-                    location: Location ->
-                mLatitude = location.latitude
-                mLongitude = location.longitude
-                loadDeliveryNow()
+                    location ->
+                if(location != null) {
+                    mLatitude = location.latitude
+                    mLongitude = location.longitude
+                    loadDeliveryNow()
+                }
             }
     }
 
@@ -345,7 +347,8 @@ class MapsFragment : Fragment(),
     }
 
     private fun setUserData(orderList: ArrayList<Order>?) {
-        val userFullname = "${orderList?.get(0)?.user?.name} ${orderList?.get(0)?.user?.lastname}"
+
+        val userFullname = if(orderList?.get(0)?.user == null) "Guest Guest" else "${orderList.get(0).user?.name} ${orderList.get(0).user?.lastname}"
         val getUserImg = orderList?.get(0)?.user?.avatar
         val userImg = BASE_URL_USER_IMG + if(getUserImg == null) "noimg.png" else getUserImg
         val getEmployeeImg = orderList?.get(0)?.employee?.emp_avatar
@@ -465,7 +468,7 @@ class MapsFragment : Fragment(),
 
 
     private fun getURL(from : LatLng, to : LatLng) : String {
-        return "https://maps.googleapis.com/maps/api/directions/json?origin=${from.latitude},${from.longitude}&destination=${to.latitude},${to.longitude}&sensor=false&mode=driving&key=AIzaSyDCkgDceoiSbeWa29pNeJxmsNipUF7P3uw"
+        return "https://maps.googleapis.com/maps/api/directions/json?origin=${from.latitude},${from.longitude}&destination=${to.latitude},${to.longitude}&sensor=false&mode=driving&key=AIzaSyB1wuvlSdpv395HjKYb1afXx_4S1c8ak4c"
     }
 
     private inner class GetDirection(val url : String) : AsyncTask<Void,Void,List<List<LatLng>>>(){

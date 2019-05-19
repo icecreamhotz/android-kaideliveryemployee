@@ -26,6 +26,7 @@ class MainActivity : AppCompatActivity() {
     private var disposable: Disposable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        checkLogin()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -41,11 +42,11 @@ class MainActivity : AppCompatActivity() {
         val editor = shared.edit()
         editor.putInt("emp_id", employee.empId)
         editor.putString("token", employee.token)
-        editor.commit()
+        editor.apply()
 
         Log.d("jwttoken", shared.getString("token", ""))
 
-        val intent = Intent(this, MainContentActivity::class.java)
+        val intent = Intent(this, DrawerLayout::class.java)
         startActivity(intent)
     }
 
@@ -75,5 +76,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun onRetrieveFinish() {
         loading.visibility  = View.GONE
+    }
+
+    private fun checkLogin() {
+        val shared = getSharedPreferences(MY_PREFS, Context.MODE_PRIVATE)
+        val token = shared.getString("token", null)
+        if(token != null) {
+            val intent = Intent(this, DrawerLayout::class.java)
+            startActivity(intent)
+        }
     }
 }

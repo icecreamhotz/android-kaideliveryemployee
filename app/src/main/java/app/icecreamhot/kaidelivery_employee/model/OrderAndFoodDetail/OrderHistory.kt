@@ -23,6 +23,7 @@ data class OrderHistory (
     val order_statusdetails: String?,
     val order_timeout: String?,
     val order_deliveryprice: Double,
+    val order_quota: Int,
     val order_price: Double,
     val order_discount: Double?,
     val order_date: String,

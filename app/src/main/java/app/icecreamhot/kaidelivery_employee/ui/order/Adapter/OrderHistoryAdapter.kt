@@ -38,6 +38,7 @@ class OrderHistoryAdapter @Inject constructor(val order: ArrayList<OrderHistory>
             val orderStatus = if(order.order_status == "5") "ยกเลิก" else "สำเร็จ"
             val orderDate = FormatDateISO8601().getDateTime(order.created_at)
             val totalPrice = order.order_deliveryprice + order.orderDetailsPrice
+            val quotaTotal = (order.orderDetailsPrice * order.restaurant.res_quota) / 100
             itemView.apply {
                 txtOrderStatus.text = "สถานะ : ${orderStatus}"
                 txtOrderStatusDetail.text = order.order_statusdetails
@@ -57,7 +58,9 @@ class OrderHistoryAdapter @Inject constructor(val order: ArrayList<OrderHistory>
                 txtRestaurantName.text = "รับ ${order.restaurant.res_name}"
                 txtEndpointName.text = "ถึง ${order.endpoint_name}"
                 txtOrderDate.text = orderDate
-                txtPriceTotal.text = "${totalPrice} $"
+                txtPriceTotal.text = "%.2f".format(totalPrice)
+                txtIncome.text = "%.2f".format(order.order_deliveryprice)
+                txtQuota.text = "%.2f".format(quotaTotal)
             }
         }
     }
