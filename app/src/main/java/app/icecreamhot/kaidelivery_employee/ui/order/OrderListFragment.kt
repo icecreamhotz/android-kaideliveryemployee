@@ -46,10 +46,10 @@ class OrderListFragment: Fragment(), GoogleApiClient.ConnectionCallbacks,
     GoogleApiClient.OnConnectionFailedListener {
 
     private val orderAPI by lazy {
-        OrderAPI.create()
+        OrderAPI.create(context!!)
     }
     private val employeeAPI by lazy {
-        EmployeeAPI.create()
+        EmployeeAPI.create(context!!)
     }
 
     private var disposable: Disposable? = null
@@ -67,12 +67,14 @@ class OrderListFragment: Fragment(), GoogleApiClient.ConnectionCallbacks,
     private lateinit var recyclerView: RecyclerView
     private lateinit var textStatus: TextView
     private lateinit var loadingOrder: ProgressBar
+    private var empId: String? = null
 
     private var pref: SharedPreferences? = null
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         pref = context?.getSharedPreferences(MY_PREFS, Context.MODE_PRIVATE)
+        empId= pref?.getString("emp_id", null)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -155,7 +157,7 @@ class OrderListFragment: Fragment(), GoogleApiClient.ConnectionCallbacks,
 
     private fun loadStatusRealtime() {
         ref = FirebaseDatabase.getInstance().getReference().child("Employees")
-        ref.child("123").addListenerForSingleValueEvent(object: ValueEventListener {
+        ref.child(empId!!).addListenerForSingleValueEvent(object: ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
                 Log.d("error", p0.toString())
             }
@@ -189,7 +191,7 @@ class OrderListFragment: Fragment(), GoogleApiClient.ConnectionCallbacks,
                         {
                                 result -> if(result.status) {
                                 val workingStatus = EmployeeStatus("online", 0)
-                                ref.child("123").setValue(workingStatus).addOnCompleteListener {
+                                ref.child(empId!!).setValue(workingStatus).addOnCompleteListener {
                                     textStatus.text = activity?.getString(R.string.online)
                                     textStatus.setTextColor(ContextCompat.getColor(activity!!.applicationContext, R.color.colorSuccess))
                                 }
@@ -209,7 +211,7 @@ class OrderListFragment: Fragment(), GoogleApiClient.ConnectionCallbacks,
                     .subscribe(
                         {
                                 result -> if(result.status) {
-                                ref.child("123").removeValue().addOnCompleteListener {
+                                ref.child(empId!!).removeValue().addOnCompleteListener {
                                     textStatus.text = activity?.getString(R.string.offline)
                                     textStatus.setTextColor(ContextCompat.getColor(activity!!.applicationContext, R.color.colorAccent))
                                 }
@@ -369,13 +371,13 @@ class OrderListFragment: Fragment(), GoogleApiClient.ConnectionCallbacks,
             createChannelChat.setValue(order_name).addOnSuccessListener {
                 val refDelivery = FirebaseDatabase.getInstance().getReference("Delivery")
 
-                val orderList = OrderFB(mLatitude, mLongitude, 123, 1)
+                val orderList = OrderFB(mLatitude, mLongitude, empId!!, 1)
 
                 refDelivery.child(order_name).setValue(orderList).addOnSuccessListener {
                     Toast.makeText(activity!!.applicationContext, "Success", Toast.LENGTH_SHORT).show()
                     val updateWorkingStatus = FirebaseDatabase.getInstance().getReference("Employees")
 
-                    updateWorkingStatus.child("123").child("status").setValue(1).addOnSuccessListener {
+                    updateWorkingStatus.child(empId!!).child("status").setValue(1).addOnSuccessListener {
                         val mapsFragment = MapsFragment()
                         val fm = fragmentManager
                         fm?.beginTransaction()

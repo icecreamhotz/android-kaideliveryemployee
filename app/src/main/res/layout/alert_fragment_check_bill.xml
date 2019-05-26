@@ -155,7 +155,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/btnAcceptOrder"
-                android:text="@string/accept_order"
+                android:text="@string/acceptorder"
                 android:layout_marginTop="10dp"
                 android:layout_weight="1"
         />

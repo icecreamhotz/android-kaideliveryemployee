@@ -11,25 +11,24 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.Button
-import android.widget.ImageButton
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import app.icecreamhot.kaidelivery_employee.R
 import app.icecreamhot.kaidelivery_employee.data.mLatitude
 import app.icecreamhot.kaidelivery_employee.data.mLongitude
 import app.icecreamhot.kaidelivery_employee.firebasemodel.OrderFB
 import app.icecreamhot.kaidelivery_employee.model.GoogleMapDTO
 import app.icecreamhot.kaidelivery_employee.model.Order
+import app.icecreamhot.kaidelivery_employee.network.EmployeeAPI
 import app.icecreamhot.kaidelivery_employee.network.OrderAPI
 import app.icecreamhot.kaidelivery_employee.ui.order.Alert.CheckBillDialog
 import app.icecreamhot.kaidelivery_employee.ui.order.Alert.ConfirmCheckBill
+import app.icecreamhot.kaidelivery_employee.ui.order.Alert.Dialog
 import app.icecreamhot.kaidelivery_employee.ui.order.Alert.FoodDetailDialog
 import app.icecreamhot.kaidelivery_employee.ui.order.Chat.ChatFragment
+import app.icecreamhot.kaidelivery_employee.ui.order.HistoryAndComment.MainFragmentHistoryAndComment
 import app.icecreamhot.kaidelivery_employee.utils.BASE_URL_EMPLOYEE_IMG
 import app.icecreamhot.kaidelivery_employee.utils.BASE_URL_USER_IMG
 import app.icecreamhot.kaidelivery_employee.utils.MY_PREFS
@@ -82,29 +81,43 @@ class MapsFragment : Fragment(),
     lateinit var imgEmployee: CircleImageView
     lateinit var imgChatButton: ImageButton
 
+    lateinit var imgEmergency: ImageView
+
     lateinit var mOrder: ArrayList<app.icecreamhot.kaidelivery_employee.model.OrderAndFoodDetail.Order>
 
     private var fcmUserToken: String? = null
     private var pref: SharedPreferences? = null
     private var jwtToken: String? = null
 
+    private var empId: String? = null
+
     private val orderAPI by lazy {
-        OrderAPI.create()
+        OrderAPI.create(context!!)
+    }
+
+    private val employeeAPI by lazy {
+        EmployeeAPI.create(context!!)
     }
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         pref = context?.getSharedPreferences(MY_PREFS, Context.MODE_PRIVATE)
         jwtToken = pref?.getString("token", null)
+        empId= pref?.getString("emp_id", null)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        setHasOptionsMenu(true)
         val view = inflater.inflate(R.layout.activity_maps_fragment, container, false)
         mMapView = view.findViewById(R.id.mapView)
         btnOrderDetail = view.findViewById<Button>(R.id.btnOrderDetail)
         txtEmployeeName = view.findViewById(R.id.txtEmployeeName)
         imgEmployee = view.findViewById(R.id.imgEmployee)
         imgChatButton = view.findViewById(R.id.imgChat)
+
+        imgEmergency = activity!!.findViewById<ImageView>(R.id.imgEmergency)
+        imgEmergency.visibility = View.VISIBLE
+
         mMapView.onCreate(savedInstanceState)
 
         mMapView.onResume()
@@ -143,17 +156,81 @@ class MapsFragment : Fragment(),
             dialogDetailFragment.show(fragmentManager, "OrderDetailFragment")
         }
 
+        imgEmergency.setOnClickListener(onEmergencyClick)
+
         return view
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
         inflater?.inflate(R.menu.option_maps_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    private fun deleteOrderFromFirebase(order_name: String) {
+        val token = pref?.getString("token", null)
+        token?.let {
+            disposable = employeeAPI.updateEmployeeStatus(1, it)
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+//                .doOnSubscribe { loadingOrder.visibility = View.VISIBLE }
+//                .doOnTerminate { loadingOrder.visibility = View.GONE }
+                .subscribe(
+                    {
+                            result ->
+                        ref = FirebaseDatabase.getInstance().getReference("Delivery").child(order_name)
+                        ref.removeValue().addOnSuccessListener {
+                            GetDirection("").cancel(true)
+                            Toast.makeText(activity!!.applicationContext, "Cancel Success", Toast.LENGTH_LONG).show()
+                            val transaction= fragmentManager
+                            transaction?.beginTransaction()
+                                ?.replace(R.id.contentContainer, MainFragmentHistoryAndComment())
+                                ?.commitAllowingStateLoss()
+                        }
+                    },
+                    {
+                            err -> Log.d("errorja", err.message)
+                    }
+                )
+        }
+    }
+
+    val onEmergencyClick = View.OnClickListener {
+        val dialogConfirm = Dialog()
+        dialogConfirm.Confirm(activity, "Calcel Order", "Do you need cancel this order really ?"
+            ,"Yes", "No", Runnable {
+                val token = pref?.getString("token", null)
+                token?.let {
+                    order_name = null
+                    disposable = orderAPI.updateStatusOrder(mOrder.get(0).order_id,
+                        5,
+                        "เกิดเหตุฉุกเฉิน",
+                        null,
+                        null,
+                        it)
+                        .subscribeOn(Schedulers.io())
+                        .unsubscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+//                    .doOnSubscribe { loadingOrder.visibility = View.VISIBLE }
+//                    .doOnTerminate { loadingOrder.visibility = View.GONE }
+                        .subscribe(
+                            {
+                                deleteOrderFromFirebase(mOrder.get(0).order_name)
+                            },
+                            {
+                                    err -> Log.d("err", err.message)
+                            }
+                        )
+
+                }
+            }, Runnable {
+                null
+            })
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
@@ -164,6 +241,10 @@ class MapsFragment : Fragment(),
             }
             R.id.onTheWay -> {
                 onClickOnTheWay()
+                true
+            }
+            R.id.toPoint -> {
+                onToPointClick()
                 true
             }
             R.id.checkBill ->
@@ -195,8 +276,8 @@ class MapsFragment : Fragment(),
                         {
                             ref = FirebaseDatabase.getInstance().getReference("Delivery")
 
-                            val latLng = OrderFB(mLatitude, mLongitude, 123, 2)
-                            ref.child(order_name!!).setValue(latLng).addOnSuccessListener {
+                            val latLng = OrderFB(mLatitude, mLongitude, empId!!, 2)
+                            ref.child(order_name).setValue(latLng).addOnSuccessListener {
                                 Toast.makeText(activity?.applicationContext, "order waiting", Toast.LENGTH_SHORT).show()
                             }
                         },
@@ -227,9 +308,46 @@ class MapsFragment : Fragment(),
                         {
                             ref = FirebaseDatabase.getInstance().getReference("Delivery")
 
-                            val latLng = OrderFB(mLatitude, mLongitude, 123, 3)
+                            val latLng = OrderFB(mLatitude, mLongitude, empId!!, 3)
                             val now = LatLng(mLatitude!!, mLongitude!!)
-                            ref.child(order_name!!).setValue(latLng).addOnSuccessListener {
+                            ref.child(order_name).setValue(latLng).addOnSuccessListener {
+                                markerRestaurant.remove()
+                                markerEmployee.position = now
+                                val url = getURL(now, endpoint)
+                                GetDirection(url).execute()
+                                Toast.makeText(activity?.applicationContext, "on the way", Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                        {
+                                err -> Log.d("err", err.message)
+                        }
+                    )
+            }
+        }
+    }
+
+    private fun onToPointClick() {
+        order_name?.let { order_name ->
+            fcmUserToken?.let { token ->
+                order_status = 6
+                disposable = orderAPI.updateStatusOrder(mOrder.get(0).order_id,
+                    6,
+                    null,
+                    "Ready to dig?, I'm here",
+                    token,
+                    jwtToken!!)
+                    .subscribeOn(Schedulers.io())
+                    .unsubscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+//                .doOnSubscribe { loadingOrder.visibility = View.VISIBLE }
+//                .doOnTerminate { loadingOrder.visibility = View.GONE }
+                    .subscribe(
+                        {
+                            ref = FirebaseDatabase.getInstance().getReference("Delivery")
+
+                            val latLng = OrderFB(mLatitude, mLongitude, empId!!, 6)
+                            val now = LatLng(mLatitude!!, mLongitude!!)
+                            ref.child(order_name).setValue(latLng).addOnSuccessListener {
                                 markerRestaurant.remove()
                                 markerEmployee.position = now
                                 val url = getURL(now, endpoint)
@@ -274,17 +392,30 @@ class MapsFragment : Fragment(),
         order_name?.let {
             ref = FirebaseDatabase.getInstance().getReference("Delivery")
 
-            val latlng = OrderFB(mLatitude, mLongitude, 123, order_status!!)
-            val now = LatLng(mLatitude!!, mLongitude!!)
-            ref.child(order_name!!).setValue(latlng).addOnSuccessListener {
-                var url = ""
-                if(order_status == 1 || order_status == 2) {
-                    url = getURL(now, restaurant)
-                } else {
-                    url = getURL(now, endpoint)
-                }
-                markerEmployee.position = now
-                GetDirection(url).execute()
+            if(mLatitude != null && mLongitude != null) {
+                ref.child(order_name!!).addValueEventListener(object: ValueEventListener {
+                    override fun onDataChange(p0: DataSnapshot) {
+                        if(p0.value != null) {
+                            val latlng = OrderFB(mLatitude, mLongitude, empId!!, order_status!!)
+                            val now = LatLng(mLatitude!!, mLongitude!!)
+                            ref.child(order_name!!).setValue(latlng).addOnSuccessListener {
+                                var url = ""
+                                if(order_status == 1 || order_status == 2) {
+                                    url = getURL(now, restaurant)
+                                } else {
+                                    url = getURL(now, endpoint)
+                                }
+                                markerEmployee.position = now
+                                GetDirection(url).execute()
+                            }
+                        }
+                    }
+
+                    override fun onCancelled(p0: DatabaseError) {
+                        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                    }
+
+                })
             }
         }
     }
@@ -568,6 +699,7 @@ class MapsFragment : Fragment(),
 
     override fun onDestroyView() {
         super.onDestroyView()
+        imgEmergency.visibility = View.GONE
         disposable?.dispose()
     }
 

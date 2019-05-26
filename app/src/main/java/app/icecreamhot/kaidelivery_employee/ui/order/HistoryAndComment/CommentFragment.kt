@@ -23,7 +23,7 @@ import io.reactivex.schedulers.Schedulers
 class CommentFragment: Fragment() {
 
     private val employeeAPI by lazy {
-        EmployeeAPI.create()
+        EmployeeAPI.create(context!!)
     }
 
     private var empId: Int? = null
@@ -59,9 +59,9 @@ class CommentFragment: Fragment() {
     }
 
     private fun loadEmployeeCommentData() {
-        val empId = pref?.getInt("emp_id", 0)
+        val empId = pref?.getString("emp_id", "")
         empId?.let {
-            disposable = employeeAPI.getEmployeeScoreAndComment(it)
+            disposable = employeeAPI.getEmployeeScoreAndComment(it.toInt())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
 //            .doOnSubscribe { loadingOrder.visibility = View.VISIBLE }

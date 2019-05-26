@@ -19,6 +19,7 @@ import app.icecreamhot.kaidelivery_employee.model.Order
 import app.icecreamhot.kaidelivery_employee.network.EmployeeAPI
 import app.icecreamhot.kaidelivery_employee.network.OrderAPI
 import app.icecreamhot.kaidelivery_employee.ui.order.Adapter.CancelOrderAdapter
+import app.icecreamhot.kaidelivery_employee.ui.order.HistoryAndComment.MainFragmentHistoryAndComment
 import app.icecreamhot.kaidelivery_employee.utils.MY_PREFS
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
@@ -29,11 +30,11 @@ import io.reactivex.schedulers.Schedulers
 class CancelOrderFragment: Fragment() {
 
     private val orderAPI by lazy {
-        OrderAPI.create()
+        OrderAPI.create(context!!)
     }
 
     private val employeeAPI by lazy {
-        EmployeeAPI.create()
+        EmployeeAPI.create(context!!)
     }
 
     private var order_id: Int? = null
@@ -49,12 +50,12 @@ class CancelOrderFragment: Fragment() {
     private lateinit var loadingOrder: ContentLoadingProgressBar
 
     var cancelOrderList = arrayOf(
-        "1. ร้านปิด",
-        "2. คนขับหาร้านไม่เจอ",
-        "3. ลูกค้าโทรไปไม่รับ",
-        "4. เกินเวลาที่ตั้งไว้",
-        "5. ข้อผิดพลาดทางระบบ",
-        "6. คนขับประสบอุบัติเหตุ"
+        "ร้านปิด",
+        "คนขับหาร้านไม่เจอ",
+        "ลูกค้าโทรไปไม่รับ",
+        "เกินเวลาที่ตั้งไว้",
+        "ข้อผิดพลาดทางระบบ",
+        "คนขับประสบอุบัติเหตุ"
     )
 
     companion object {
@@ -123,7 +124,11 @@ class CancelOrderFragment: Fragment() {
                             ref = FirebaseDatabase.getInstance().getReference("Orders").child(order_name)
                             ref.removeValue().addOnSuccessListener {
                                 Toast.makeText(activity!!.applicationContext, "Cancel Success", Toast.LENGTH_LONG).show()
-                                popStacktoOrderListFragment()
+                                val goFragment = MainFragmentHistoryAndComment()
+                                val fm = fragmentManager
+                                fm?.beginTransaction()
+                                    ?.replace(R.id.contentContainer, goFragment)
+                                    ?.commit()
                             }
                     },
                     {
@@ -139,10 +144,10 @@ class CancelOrderFragment: Fragment() {
             orderStatusDetails?.let {
                 disposable = orderAPI.updateStatusOrder(order_id!!,
                     5,
-                    orderStatusDetails,
+                    it,
                     null,
                     null,
-                    it)
+                    token)
                     .subscribeOn(Schedulers.io())
                     .unsubscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())

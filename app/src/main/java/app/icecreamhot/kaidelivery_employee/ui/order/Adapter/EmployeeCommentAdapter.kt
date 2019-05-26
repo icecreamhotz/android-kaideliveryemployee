@@ -30,9 +30,9 @@ class EmployeeCommentAdapter(val scoreCommentList: ArrayList<EmployeeScore>): Re
     class ViewHolder(view: View): RecyclerView.ViewHolder(view) {
 
         fun bind(scoreComment: EmployeeScore) {
-            val fullName = "${scoreComment.user.name} ${scoreComment.user.lastname}"
-            var avatar = scoreComment.user.avatar
-            val imgUser = BASE_URL_USER_IMG + if(avatar == null) "noimg.png" else avatar
+            val fullName = if(scoreComment.user == null) "Guest Guest" else "${scoreComment.user.name} ${scoreComment.user.lastname}"
+            var avatar = if(scoreComment.user == null) "noimg.png" else scoreComment.user.avatar
+            val imgUser = BASE_URL_USER_IMG + avatar
             val dateComment = FormatDateISO8601().getDateTime(scoreComment.empscore_date)
             val detailComment = scoreComment.empscore_comment
             val detailRate = scoreComment.empscore_rating.toString()

@@ -20,7 +20,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity() {
 
     private val employeeAPI by lazy {
-        EmployeeAPI.create()
+        EmployeeAPI.create(this)
     }
 
     private var disposable: Disposable? = null
@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
     private fun loginSuccess(employee: Employee) {
         val shared = getSharedPreferences(MY_PREFS, Context.MODE_PRIVATE)
         val editor = shared.edit()
-        editor.putInt("emp_id", employee.empId)
+        editor.putString("emp_id", employee.empId.toString())
         editor.putString("token", employee.token)
         editor.apply()
 

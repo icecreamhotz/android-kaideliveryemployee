@@ -25,7 +25,8 @@
 
     <!-- option status on map activity -->
     <string name="order_waiting">Order Waiting</string>
-    <string name="order_ontheway">One The Way</string>
+    <string name="order_ontheway">On The Way</string>
+    <string name="order_dig">To the Point</string>
     <string name="order_checkbill">Check Bill</string>
 
     <!-- option next previous queue -->
@@ -67,7 +68,7 @@
     <string name="subtotal">Subtotal</string>
     <string name="delivery">Delivery</string>
     <string name="total">Total</string>
-
+    <string name="totalcustom">Total(Custom)</string>
     <!-- alert confirm check bill -->
     <string name="custom_price_header">Custom Price</string>
     <string name="custom_price">Price</string>

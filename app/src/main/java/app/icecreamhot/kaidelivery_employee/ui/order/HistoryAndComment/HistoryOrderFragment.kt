@@ -24,7 +24,7 @@ import io.reactivex.schedulers.Schedulers
 class HistoryOrderFragment: Fragment() {
 
     private val orderAPI by lazy {
-        OrderAPI.create()
+        OrderAPI.create(context!!)
     }
 
     lateinit var rvHistoryOrder: RecyclerView

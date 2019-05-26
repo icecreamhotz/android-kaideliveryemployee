@@ -42,6 +42,7 @@ dependencies {
     implementation "androidx.appcompat:appcompat:$android_support_version"
     implementation "androidx.legacy:legacy-support-v4:$android_support_version"
     implementation "com.google.android.gms:play-services-location:16.0.0"
+    implementation 'com.android.support:multidex:1.0.1' // Include this
     // Support Design
     implementation "com.google.android.material:material:$android_support_version"
     // RecyclerView

@@ -1,11 +1,19 @@
 package app.icecreamhot.kaidelivery_employee.network
 
+import android.content.Context
+import android.content.Intent
+import android.util.Log
+import app.icecreamhot.kaidelivery_employee.MainActivity
 import app.icecreamhot.kaidelivery_employee.model.OrderAndFoodDetail.OrderHistoryResponse
 import app.icecreamhot.kaidelivery_employee.model.OrderAndFoodDetail.OrderResponse
 import app.icecreamhot.kaidelivery_employee.model.OrderList
 import app.icecreamhot.kaidelivery_employee.model.ResponseMAS
 import app.icecreamhot.kaidelivery_employee.utils.BASE_URL
+import app.icecreamhot.kaidelivery_employee.utils.MY_PREFS
 import io.reactivex.Observable
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
+import okhttp3.Response
 import okhttp3.ResponseBody
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -36,7 +44,7 @@ interface OrderAPI {
                           @Field("order_status") order_status: Int,
                           @Field("order_statusdetails") order_statusdetails: String?,
                           @Field("message") message: String?,
-                          @Field("token") token: String?,
+                          @Field("token") getHistoryOrderEmployeetoken: String?,
                           @Header("authorization") jwtToken: String): Observable<ResponseMAS>
 
     @FormUrlEncoded
@@ -61,7 +69,22 @@ interface OrderAPI {
                         @Field("order_price") order_price: Double): Observable<ResponseMAS>
 
     companion object {
-        fun create(): OrderAPI {
+        fun create(context: Context): OrderAPI {
+            val clientBuilder = OkHttpClient.Builder()
+            clientBuilder.addInterceptor(object: Interceptor {
+                override fun intercept(chain: Interceptor.Chain): Response {
+                    val request = chain.request()
+                    val response = chain.proceed(request)
+                    if(response.code() == 401) {
+                        val shared = context.getSharedPreferences(MY_PREFS, Context.MODE_PRIVATE)
+                        shared.edit().remove("token").apply()
+                        Log.d("logout", shared.getString("token", "not"))
+                        val intent = Intent(context, MainActivity::class.java)
+                        context.startActivity(intent)
+                    }
+                    return response
+                }
+            })
             val retrofit = Retrofit.Builder()
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())

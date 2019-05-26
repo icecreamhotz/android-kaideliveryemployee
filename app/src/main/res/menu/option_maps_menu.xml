@@ -12,6 +12,11 @@
     />
 
     <item
+            android:title="@string/order_dig"
+            android:id="@+id/toPoint"
+    />
+
+    <item
         android:title="@string/order_checkbill"
         android:id="@+id/checkBill"
     />

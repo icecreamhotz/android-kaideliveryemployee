@@ -96,9 +96,9 @@ class OrderListAdapter @Inject constructor(val items: ArrayList<Order>): Recycle
                 txtRestaurantName.text = order.restaurant?.res_name
                 txtRestaurantAddress.text = order.endpoint_name
                 txtDistanceRestaurant.text = restaurantDistance
-                txtFoodPrice.text = "${foodPrice} ${aliasBath}"
-                txtDeveliryprice.text = "${deliveryPrice} ${aliasBath}"
-                txtAllPrice.text = "${allPrice} ${aliasBath}"
+                txtFoodPrice.text = "${"%.2f".format(foodPrice)} ${aliasBath}"
+                txtDeveliryprice.text = "${"%.2f".format(deliveryPrice)} ${aliasBath}"
+                txtAllPrice.text = "${"%.2f".format(allPrice)} ${aliasBath}"
             }
         }
 

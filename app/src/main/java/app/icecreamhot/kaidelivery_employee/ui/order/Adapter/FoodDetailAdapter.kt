@@ -23,9 +23,10 @@ class FoodDetailAdapter(val food: ArrayList<OrderDetail>): RecyclerView.Adapter<
 
     class ViewHolder(view: View): RecyclerView.ViewHolder(view) {
         fun bind(food: OrderDetail) {
+            val price = food.orderdetail_price
             itemView.apply {
                 foodName.text = food.food.food_name
-                foodTotalAndPrice.text = "x${food.orderdetail_total} (${food.orderdetail_price}บาท)"
+                foodTotalAndPrice.text = "x${food.orderdetail_total} (${price}บาท)"
             }
         }
     }

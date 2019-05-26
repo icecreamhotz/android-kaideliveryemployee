@@ -55,11 +55,11 @@ class CheckBillDialog: DialogFragment() {
     private var foodPrice = 0.0
 
     private val orderAPI by lazy {
-        OrderAPI.create()
+        OrderAPI.create(context!!)
     }
 
     private val employeeAPI by lazy {
-        EmployeeAPI.create()
+        EmployeeAPI.create(context!!)
     }
 
     private var disposable: Disposable? = null
@@ -115,8 +115,10 @@ class CheckBillDialog: DialogFragment() {
             override fun onTextChanged(s: CharSequence, start: Int,
                                        before: Int, count: Int) {
                 if(s.isNotEmpty()) {
-                    val calChange = s.toString().toInt() - allPrice
-                    txtCalChange.text = "ทอน ${String.format("%.2f", calChange)} บาท"
+                    if(s.toString().toInt() > allPrice) {
+                        val calChange = s.toString().toInt() - allPrice
+                        txtCalChange.text = "ทอน ${String.format("%.2f", calChange)} บาท"
+                    }
                 } else {
                     txtCalChange.text = "ทอน 0 บาท"
                     return
@@ -200,7 +202,7 @@ class CheckBillDialog: DialogFragment() {
                             val fm = fragmentManager
                             fm?.beginTransaction()
                                 ?.replace(R.id.contentContainer, goFragement)
-                                ?.commitAllowingStateLoss()
+                                ?.commit()
                             dialog.dismiss()
                         }
                     },
